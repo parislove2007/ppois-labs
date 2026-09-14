@@ -13,6 +13,7 @@ class Rectangle
     Point bottomRight() const;
     Point topRight() const;
     Point topLeft() const;
+    bool operator==(const Rectangle& other) const;
     
     private:
 

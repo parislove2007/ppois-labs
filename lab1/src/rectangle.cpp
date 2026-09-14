@@ -21,3 +21,8 @@ Point Rectangle::topLeft() const
     int topY = topRight_.y();
     return Point(leftX,topY);
 }
+
+bool Rectangle::operator==(const Rectangle& other) const
+{
+    return (bottomLeft_ == other.bottomLeft_ && topRight_ == other.topRight_);
+}

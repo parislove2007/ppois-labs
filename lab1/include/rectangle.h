@@ -1,5 +1,6 @@
 #pragma once
 #include "point.h"
+#include <iosfwd>
 
 class Rectangle
 {
@@ -22,3 +23,7 @@ class Rectangle
     
     
 };
+
+std::ostream& operator<<(std::ostream& out, const Rectangle& rectangle);
+std::istream& operator>>(std::istream& in, Rectangle& rectangle);
+

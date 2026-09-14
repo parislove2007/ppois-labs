@@ -1,4 +1,6 @@
 #include "rectangle.h"
+#include<ostream>
+#include<istream>
 
 Rectangle::Rectangle(Point bottomLeft, Point topRight) : bottomLeft_(bottomLeft),topRight_(topRight) {}
 
@@ -24,5 +26,23 @@ Point Rectangle::topLeft() const
 
 bool Rectangle::operator==(const Rectangle& other) const
 {
-    return (bottomLeft_ == other.bottomLeft_ && topRight_ == other.topRight_);
+    return bottomLeft_ == other.bottomLeft_ && topRight_ == other.topRight_;
+}
+
+std::ostream& operator<<(std::ostream& out, const Rectangle& rectangle)
+{
+    out<<rectangle.bottomLeft()<<" "<<rectangle.topRight();
+    return out;
+}
+
+std::istream& operator>>(std::istream& in, Rectangle& rectangle)
+{
+    Point bottomLeft;
+    Point topRight;
+    in >> bottomLeft >> topRight;    
+    if(in)
+    {
+           rectangle = Rectangle(bottomLeft,topRight);
+    }
+    return in;
 }

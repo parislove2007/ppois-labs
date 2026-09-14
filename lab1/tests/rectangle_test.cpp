@@ -65,3 +65,9 @@ TEST(RectangleTest, SurvivesRoundTrip)
     EXPECT_EQ(restored, original);
 }
 
+TEST (RectangleTest,RectangleMoves )
+{
+    Rectangle rectangle ({0,0},{3,7});
+    rectangle.move(5,9);
+    EXPECT_EQ(rectangle,Rectangle({5,9},{8,16}));
+}

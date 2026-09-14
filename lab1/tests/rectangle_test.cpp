@@ -71,3 +71,11 @@ TEST (RectangleTest,RectangleMoves )
     rectangle.move(5,9);
     EXPECT_EQ(rectangle,Rectangle({5,9},{8,16}));
 }
+
+TEST (RectangleTest, RectangleResize)
+{
+    Rectangle rectangle ({3,5},{10,7});
+    rectangle.resize(15,16);
+    EXPECT_EQ(rectangle,Rectangle({3,5},{18,21}));
+    EXPECT_THROW(rectangle.resize(-5, 3), std::invalid_argument);
+}

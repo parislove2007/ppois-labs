@@ -1,5 +1,6 @@
 #pragma once
 #include "point.h"
+#include <iosfwd>
 
 class Rectangle
 {
@@ -14,6 +15,7 @@ class Rectangle
     Point topRight() const;
     Point topLeft() const;
     bool operator==(const Rectangle& other) const;
+    void move(int deltaX, int deltaY);
     
     private:
 
@@ -22,3 +24,7 @@ class Rectangle
     
     
 };
+
+std::ostream& operator<<(std::ostream& out, const Rectangle& rectangle);
+std::istream& operator>>(std::istream& in, Rectangle& rectangle);
+

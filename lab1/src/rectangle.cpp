@@ -29,6 +29,15 @@ bool Rectangle::operator==(const Rectangle& other) const
     return bottomLeft_ == other.bottomLeft_ && topRight_ == other.topRight_;
 }
 
+void Rectangle:: move(int deltaX, int deltaY)
+
+    {
+        Point newBottomLeft(bottomLeft_.x() + deltaX, bottomLeft_.y() + deltaY);
+        Point newTopRight(topRight_.x() + deltaX, topRight_.y() + deltaY);
+        bottomLeft_ = newBottomLeft;
+        topRight_ = newTopRight;
+    }
+
 std::ostream& operator<<(std::ostream& out, const Rectangle& rectangle)
 {
     out<<rectangle.bottomLeft()<<" "<<rectangle.topRight();

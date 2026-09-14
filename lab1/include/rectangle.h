@@ -15,6 +15,7 @@ class Rectangle
     Point topRight() const;
     Point topLeft() const;
     bool operator==(const Rectangle& other) const;
+    void move(int deltaX, int deltaY);
     
     private:
 

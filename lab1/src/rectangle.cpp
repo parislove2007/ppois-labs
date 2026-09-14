@@ -1,6 +1,7 @@
 #include "rectangle.h"
 #include<ostream>
 #include<istream>
+#include <stdexcept>
 
 Rectangle::Rectangle(Point bottomLeft, Point topRight) : bottomLeft_(bottomLeft),topRight_(topRight) {}
 
@@ -35,6 +36,15 @@ void Rectangle:: move(int deltaX, int deltaY)
         Point newBottomLeft(bottomLeft_.x() + deltaX, bottomLeft_.y() + deltaY);
         Point newTopRight(topRight_.x() + deltaX, topRight_.y() + deltaY);
         bottomLeft_ = newBottomLeft;
+        topRight_ = newTopRight;
+    }
+void Rectangle::resize(int width, int height)
+    {
+        if (width < 0 || height < 0)
+            {
+                throw std::invalid_argument("...");
+            }
+        Point newTopRight(width + bottomLeft_.x(),height + bottomLeft_.y());
         topRight_ = newTopRight;
     }
 

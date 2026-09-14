@@ -16,6 +16,7 @@ class Rectangle
     Point topLeft() const;
     bool operator==(const Rectangle& other) const;
     void move(int deltaX, int deltaY);
+    void resize(int width, int height);
     
     private:
 

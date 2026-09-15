@@ -2,6 +2,7 @@
 #include "rectangle.h"
 #include <sstream>
 #include "point.h"
+#include <stdexcept>
 
 TEST(RectangleTest, StoresCoordinates)
 {
@@ -79,3 +80,56 @@ TEST (RectangleTest, RectangleResize)
     EXPECT_EQ(rectangle,Rectangle({3,5},{18,21}));
     EXPECT_THROW(rectangle.resize(-5, 3), std::invalid_argument);
 }
+
+TEST (RectangleTest, PrefixIncrement)
+{
+    Rectangle rectangle({1,2},{5,7});
+    ++rectangle;
+    EXPECT_EQ(rectangle, Rectangle({1,2},{6,8}));
+}
+
+TEST (RectangleTest, PostfixIncrement)
+{
+    Rectangle rectangle({1,2},{6,7});
+    rectangle++;
+    EXPECT_EQ(rectangle, Rectangle({1,2},{7,8}));
+}
+
+TEST (RectangleTest, PrefixDecrement)
+{
+    Rectangle rectangle({4,5},{9,12});
+    --rectangle;
+    EXPECT_EQ(rectangle, Rectangle ({4,5},{8,11}));
+}
+
+TEST (RectangleTest, PostfixDecrement)
+{
+    Rectangle rectangle({4,5},{10,15});
+    rectangle--;
+    EXPECT_EQ(rectangle, Rectangle({4,5},{9,14}));
+}
+
+TEST(RectangleTest, PostfixIncrementReturnsOldValue)
+{
+    Rectangle rectangle({1, 2}, {6, 7});
+
+    Rectangle returned = rectangle++;
+
+    EXPECT_EQ(returned, Rectangle({1, 2}, {6, 7})); 
+    EXPECT_EQ(rectangle, Rectangle({1, 2}, {7, 8})); 
+}
+
+TEST(RectangleTest, PrefixDecrementThrowRectangle)
+{
+    Rectangle rectangle({0, 0}, {0, 0});
+
+    EXPECT_THROW(--rectangle, std::invalid_argument);
+}
+
+TEST(RectangleTest, PostfixDecrementThrowRectangle)
+{
+    Rectangle rectangle({0, 0}, {0, 0});
+
+    EXPECT_THROW(rectangle--, std::invalid_argument);
+}
+

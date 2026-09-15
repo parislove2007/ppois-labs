@@ -30,6 +30,40 @@ bool Rectangle::operator==(const Rectangle& other) const
     return bottomLeft_ == other.bottomLeft_ && topRight_ == other.topRight_;
 }
 
+Rectangle& Rectangle:: operator++()
+{
+    Point newTopRight(topRight_.x() + 1, topRight_.y() + 1);
+    topRight_ = newTopRight;
+    return *this;
+}
+
+Rectangle Rectangle :: operator++(int) 
+{
+    Rectangle old = *this;
+    ++(*this);
+    return old;
+}
+
+Rectangle& Rectangle:: operator--()
+{
+    Point newTopRight(topRight_.x() - 1, topRight_.y() - 1);
+    
+
+    if(newTopRight.x() < bottomLeft_.x() || newTopRight.y() < bottomLeft_.y())
+        throw std::invalid_argument("Вы что-то перепутали...");
+
+    topRight_ = newTopRight;
+
+    return *this;
+}
+
+Rectangle Rectangle :: operator--(int) 
+{
+    Rectangle old = *this;
+    --(*this);
+    return old;
+}
+
 void Rectangle:: move(int deltaX, int deltaY)
 
     {
@@ -42,7 +76,7 @@ void Rectangle::resize(int width, int height)
     {
         if (width < 0 || height < 0)
             {
-                throw std::invalid_argument("...");
+                throw std::invalid_argument("Вы что-то перепутали...");
             }
         Point newTopRight(width + bottomLeft_.x(),height + bottomLeft_.y());
         topRight_ = newTopRight;

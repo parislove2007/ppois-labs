@@ -17,7 +17,12 @@ class Rectangle
     bool operator==(const Rectangle& other) const;
     void move(int deltaX, int deltaY);
     void resize(int width, int height);
-    
+    Rectangle& operator++();
+    Rectangle operator++(int);
+    Rectangle& operator--();
+    Rectangle operator--(int);
+
+
     private:
 
     Point bottomLeft_;

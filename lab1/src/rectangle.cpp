@@ -1,6 +1,7 @@
 #include "rectangle.h"
 #include<ostream>
 #include<istream>
+#include<algorithm>
 #include <stdexcept>
 
 Rectangle::Rectangle(Point bottomLeft, Point topRight) : bottomLeft_(bottomLeft),topRight_(topRight) {}
@@ -98,4 +99,24 @@ std::istream& operator>>(std::istream& in, Rectangle& rectangle)
            rectangle = Rectangle(bottomLeft,topRight);
     }
     return in;
+}
+
+Rectangle& Rectangle::operator+=(const Rectangle& other)
+{
+    int newLeft = std::min(left(), other.left());
+    int newBottom = std::min(bottom(), other.bottom());
+    int newRight = std::max(right(), other.right());
+    int newTop = std::max(top(), other.top());
+
+    bottomLeft_ = Point(newLeft, newBottom);
+    topRight_ = Point(newRight, newTop);
+
+    return *this;
+}
+
+Rectangle Rectangle::operator+(const Rectangle& other) const
+{
+    Rectangle result = *this;
+    result += other;
+    return result;
 }

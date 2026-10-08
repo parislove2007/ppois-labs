@@ -133,3 +133,36 @@ TEST(RectangleTest, PostfixDecrementThrowRectangle)
     EXPECT_THROW(rectangle--, std::invalid_argument);
 }
 
+TEST(RectangleTest, PlusEqualsBuildsBoundingBox)
+{
+    Rectangle rectangle({0,0}, {5,5});
+    Rectangle other ({3,3}, {10,10});
+
+    rectangle += other;
+    EXPECT_EQ(rectangle, Rectangle({0,0}, {10,10}));
+}
+
+TEST(RectangleTest, PlusDoesNotModifyOperands)
+{
+    Rectangle first({0,0}, {5,5});
+    Rectangle second({3,3},{10,10});
+    Rectangle result = first + second;
+
+    EXPECT_EQ(result, Rectangle({0,0},{10,10}));
+    EXPECT_EQ(first, Rectangle({0,0},{5,5}));
+    EXPECT_EQ(second, Rectangle({3,3},{10,10}));
+}
+
+TEST(RectangleTest, PlusEqualsKeepsOuterWhenNested)
+{
+    Rectangle outer {{0,0},{10,10}};
+    Rectangle inner {{2,2}, {5,5}};
+
+    outer += inner;
+
+    EXPECT_EQ(outer, Rectangle({0,0}, {10,10}));
+}
+
+
+
+

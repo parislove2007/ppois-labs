@@ -23,12 +23,17 @@ class Rectangle
     Rectangle operator--(int);
     Rectangle& operator+=(const Rectangle& other);
     Rectangle operator+ (const Rectangle& other) const;
+    Rectangle& operator-=(const Rectangle& other);
+    Rectangle operator-(const Rectangle& other) const;
+    bool isEmpty() const;
+    static Rectangle empty();
 
 
     private:
 
     Point bottomLeft_;
     Point topRight_;
+    bool isEmpty_;
     
     
 };

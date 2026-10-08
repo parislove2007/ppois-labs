@@ -21,6 +21,8 @@ class Rectangle
     Rectangle operator++(int);
     Rectangle& operator--();
     Rectangle operator--(int);
+    Rectangle& operator+=(const Rectangle& other);
+    Rectangle operator+ (const Rectangle& other) const;
 
 
     private:

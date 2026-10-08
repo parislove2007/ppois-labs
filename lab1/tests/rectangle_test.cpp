@@ -163,6 +163,8 @@ TEST(RectangleTest, PlusEqualsKeepsOuterWhenNested)
     EXPECT_EQ(outer, Rectangle({0,0}, {10,10}));
 }
 
-
-
-
+TEST(RectangleTest, EmptyRectangleIsEmpty)
+{
+    EXPECT_TRUE(Rectangle:: empty().isEmpty());
+    EXPECT_FALSE(Rectangle({0,0},{1,1}).isEmpty());
+}

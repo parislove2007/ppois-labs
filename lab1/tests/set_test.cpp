@@ -19,3 +19,40 @@ TEST(SetElementTest, CopyOwnsSeparateNestedSet)
     EXPECT_FALSE(copy.isAtom());
     EXPECT_NE(&original.nested(), &copy.nested());
 }
+
+TEST(SetTest, AddIgnoresDuplicates)
+{
+    Set set;
+    set.add(SetElement(std::string("a")));
+    set.add(SetElement(std::string("a")));
+
+    EXPECT_EQ(set.size(), 1u);
+}
+
+TEST(SetTest, EqualityIgnoresOrder)
+{
+    Set first;
+    first.add(SetElement(std::string("a")));
+    first.add(SetElement(std::string("b")));
+
+    Set second;
+    second.add(SetElement(std::string("b")));
+    second.add(SetElement(std::string("a")));
+
+    EXPECT_EQ(first, second);
+}
+
+TEST(SetTest, EqualityHandlesNestedSets)
+{
+    Set inner;
+    inner.add(SetElement(std::string("a")));
+    inner.add(SetElement(std::string("b")));
+
+    Set first;
+    first.add(SetElement(inner));
+
+    Set second;
+    second.add(SetElement(inner));
+
+    EXPECT_EQ(first, second);
+}

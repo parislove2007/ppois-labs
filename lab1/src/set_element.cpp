@@ -35,6 +35,20 @@ SetElement& SetElement::operator=(const SetElement& other)
     return *this;
 }
 
+bool SetElement::operator==(const SetElement& other) const
+{
+    if(isAtom() != other.isAtom())
+    {
+        return false;
+    }
+    if(isAtom())
+    {
+        return atom_ == other.atom_;
+    }
+
+    return *nested_ == *other.nested_;
+}
+
 SetElement::~SetElement()
 {
     delete nested_;

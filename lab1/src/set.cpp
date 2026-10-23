@@ -1,11 +1,13 @@
 #include "set.h"
+#include<algorithm>
+
 
 Set::Set() {}
 
 
-Set::operator==(const Set& other) const
+bool Set::operator==(const Set& other) const
 {
-    if(if elements_.size ()!= other.elements_.size())
+    if( elements_.size ()!= other.elements_.size())
     {
         return false;
     }
@@ -18,25 +20,11 @@ Set::operator==(const Set& other) const
     return true;
 }
 
-SetElement::operator==(const SetElement& other) const
-{
-    if(isAtom() != other.IsAtom())
-    {
-        return false;
-    }
-    if(isAtom())
-    {
-        return atom_ == other.atom_;
-    }
-
-    return *nested_ == *other.nested_
-}
-
-int Set::size(const Set& elements) const
-{
+std::size_t Set::size() const { 
     return elements_.size();
-}
-bool Set:: isEmpty(const Set& elements) const 
+ }
+
+bool Set:: isEmpty() const 
 {
     return elements_.empty();
 }
@@ -51,4 +39,85 @@ bool Set::contains(const SetElement& element) const
         }
     }
     return false;
+}
+
+void Set::add(const SetElement& element)
+{
+    if (contains(element))
+    {
+        return;
+    }
+    elements_.push_back(element);
+}
+
+void Set::remove(const SetElement& element)
+{
+    auto position = std::find(elements_.begin(), elements_.end(), element);
+
+    if (position != elements_.end())
+    {
+        elements_.erase(position);
+    }
+}
+
+Set& Set::operator+=(const Set& other)
+{
+    for (const SetElement& element : other.elements_)
+    {
+        add(element);
+    }
+    return *this;
+}
+
+Set& Set::operator*=(const Set& other)
+{
+    std::vector<SetElement> common;
+
+    for (const SetElement& element : elements_)
+    {
+        if (other.contains(element))
+        {
+            common.push_back(element);
+        }
+    }
+
+    elements_ = common;
+    return *this;
+}
+
+Set Set::operator+(const Set& other) const
+{
+    Set result = *this;
+    result += other;
+    return result;
+}
+
+Set& Set::operator-=(const Set& other)
+{
+    std::vector<SetElement> common;
+
+    for (const SetElement& element : elements_)
+    {
+        if (!other.contains(element))
+        {
+            common.push_back(element);
+        }
+    }
+
+    elements_ = common;
+    return *this;
+}
+
+Set Set::operator*(const Set& other) const
+{
+    Set result = *this;
+    result *= other;
+    return result;
+}
+
+Set Set::operator-(const Set& other) const
+{
+    Set result = *this;
+    result -= other;
+    return result;
 }

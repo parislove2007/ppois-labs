@@ -1,5 +1,6 @@
 #include "set.h"
 #include<algorithm>
+#include <stdexcept>
 
 
 Set::Set() {}
@@ -121,3 +122,52 @@ Set Set::operator-(const Set& other) const
     result -= other;
     return result;
 }
+
+bool Set::operator[](const SetElement& element) const
+{
+    return contains(element);
+}
+
+Set Set::powerSet() const
+{
+    if (elements_.size() > maxPowerSetSource)
+    {
+        throw std::length_error("Error! Invalid length");
+    }
+
+    Set result;
+    const std::size_t subsetCount = 1u << elements_.size();
+
+    for (std::size_t mask = 0; mask < subsetCount; ++mask)
+    {
+        Set subset;
+
+        for (std::size_t index = 0; index < elements_.size(); ++index)
+        {
+            if (mask & (1u << index))
+            {
+                subset.add(elements_[index]);
+            }
+        }
+
+        result.add(SetElement(subset));
+    }
+
+    return result;
+}
+
+std::ostream& operator<<(std::ostream& out, const Set& set)
+{
+    out << "{";
+    for (std::size_t index = 0; index < set.size(); ++index)
+    {
+        if (index > 0)
+        {
+            out << ", ";
+        }
+        out << elements_[index];
+    }
+    out << "}";
+    return out;
+}
+

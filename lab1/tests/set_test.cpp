@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "set.h"
 #include "set_element.h"
+#include <sstream>
 
 TEST(SetElementTest, AtomHasNoNestedSet)
 {
@@ -82,4 +83,19 @@ TEST(SetTest, PowerSetOfSingletonHasTwoElements)
     set.add(SetElement(std::string("a")));
 
     EXPECT_EQ(set.powerSet().size(), 2u);
+}
+
+TEST(SetTest, WritesNestedStructure)
+{
+    Set inner;
+    inner.add(SetElement(std::string("a")));
+
+    Set set;
+    set.add(SetElement(std::string("x")));
+    set.add(SetElement(inner));
+
+    std::ostringstream output;
+    output << set;
+
+    EXPECT_EQ(output.str(), "{x, {a}}");
 }

@@ -1,6 +1,7 @@
 #include "set.h"
 #include<algorithm>
 #include <stdexcept>
+#include <ostream>
 
 
 Set::Set() {}
@@ -156,6 +157,10 @@ Set Set::powerSet() const
     return result;
 }
 
+const SetElement& Set::at(std::size_t index) const{
+    return elements_[index];
+}
+
 std::ostream& operator<<(std::ostream& out, const Set& set)
 {
     out << "{";
@@ -165,7 +170,7 @@ std::ostream& operator<<(std::ostream& out, const Set& set)
         {
             out << ", ";
         }
-        out << elements_[index];
+        out << set.at(index);
     }
     out << "}";
     return out;

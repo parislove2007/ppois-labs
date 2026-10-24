@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iosfwd>
 #include <string>
 
 class Set;  
@@ -24,3 +25,5 @@ private:
     std::string atom_;
     Set* nested_;      
 };
+
+std::ostream& operator<<(std::ostream& out, const SetElement& element);

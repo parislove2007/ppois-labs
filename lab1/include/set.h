@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <vector>
 #include "set_element.h"
+#include <iosfwd>
 
 class Set
 {
@@ -21,6 +22,7 @@ public:
     Set operator-(const Set& other) const;
     bool operator[](const SetElement& element) const;
     Set powerSet() const;
+    const SetElement& at(std::size_t index) const;
 
 
 private:
@@ -29,3 +31,4 @@ private:
     
 };
 
+std::ostream& operator<<(std::ostream& out, const Set& set);

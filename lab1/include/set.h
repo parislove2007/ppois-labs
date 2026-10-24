@@ -19,10 +19,13 @@ public:
     Set operator*(const Set& other) const;
     Set& operator-=(const Set& other);
     Set operator-(const Set& other) const;
-    
+    bool operator[](const SetElement& element) const;
+    Set powerSet() const;
 
 
 private:
     std::vector<SetElement> elements_;
+    static const std::size_t maxPowerSetSource = 20;
+    
 };
 

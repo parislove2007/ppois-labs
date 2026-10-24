@@ -7,10 +7,11 @@ FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googlet
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
-add_library(lab1_core STATIC src/point.cpp src/rectangle.cpp src/set_element.cpp src/set.cpp)
+add_library(lab1_core STATIC src/point.cpp src/rectangle.cpp src/set_element.cpp src/set.cpp src/set_parser.cpp)
 target_include_directories(lab1_core PUBLIC include)
 add_executable(lab1_app app/main.cpp)
 target_link_libraries(lab1_app PRIVATE lab1_core)
-add_executable(lab1_tests tests/point_test.cpp tests/rectangle_test.cpp tests/set_test.cpp)
+add_executable(lab1_tests tests/point_test.cpp tests/rectangle_test.cpp tests/set_test.cpp tests/parser_test.cpp)
 target_link_libraries(lab1_tests PRIVATE lab1_core GTest::gtest_main)
 gtest_discover_tests(lab1_tests)
+

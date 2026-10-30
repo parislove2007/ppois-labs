@@ -26,7 +26,7 @@ std::size_t Set::size() const {
     return elements_.size();
  }
 
-bool Set:: isEmpty() const 
+bool Set::isEmpty() const 
 {
     return elements_.empty();
 }

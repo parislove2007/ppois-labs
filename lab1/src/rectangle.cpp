@@ -33,7 +33,7 @@ bool Rectangle::operator==(const Rectangle& other) const
     return bottomLeft_ == other.bottomLeft_ && topRight_ == other.topRight_;
 }
 
-Rectangle& Rectangle:: operator++()
+Rectangle& Rectangle::operator++()
 {
     if (isEmpty_) return *this; 
     Point newTopRight(topRight_.x() + 1, topRight_.y() + 1);
@@ -41,14 +41,14 @@ Rectangle& Rectangle:: operator++()
     return *this;
 }
 
-Rectangle Rectangle :: operator++(int) 
+Rectangle Rectangle::operator++(int) 
 {
     Rectangle old = *this;
     ++(*this);
     return old;
 }
 
-Rectangle& Rectangle:: operator--()
+Rectangle& Rectangle::operator--()
 {
     if (isEmpty_) return *this;
     Point newTopRight(topRight_.x() - 1, topRight_.y() - 1);
@@ -76,7 +76,7 @@ Rectangle Rectangle::operator-(const Rectangle& other) const
     return result;
 }
 
-void Rectangle:: move(int deltaX, int deltaY)
+void Rectangle::move(int deltaX, int deltaY)
     {
         if (isEmpty_) return;        
         Point newBottomLeft(bottomLeft_.x() + deltaX, bottomLeft_.y() + deltaY);

@@ -28,6 +28,7 @@ public:
 private:
     std::vector<SetElement> elements_;
     static const std::size_t maxPowerSetSource = 20;
+    void appendUnchecked(const SetElement& element);
     
 };
 

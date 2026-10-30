@@ -228,3 +228,9 @@ TEST(SetElementTest, AtomIsNotEqualToNestedSet)
 
     EXPECT_FALSE(atom == nested);
 }
+
+TEST(SetTest, SameSizeDifferentContentAreNotEqual)
+{
+    EXPECT_NE(SetParser::parse("{a}"), SetParser::parse("{b}"));
+    EXPECT_NE(SetParser::parse("{a, b}"), SetParser::parse("{a, c}"));
+}

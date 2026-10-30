@@ -52,6 +52,11 @@ void Set::add(const SetElement& element)
     elements_.push_back(element);
 }
 
+void Set::appendUnchecked(const SetElement& element)
+{
+    elements_.push_back(element);
+}
+
 void Set::remove(const SetElement& element)
 {
     auto position = std::find(elements_.begin(), elements_.end(), element);
@@ -147,11 +152,11 @@ Set Set::powerSet() const
         {
             if (mask & (1u << index))
             {
-                subset.add(elements_[index]);
+                subset.appendUnchecked(elements_[index]);
             }
         }
 
-        result.add(SetElement(subset));
+            result.appendUnchecked(SetElement(subset));
     }
 
     return result;

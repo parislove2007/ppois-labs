@@ -54,3 +54,8 @@ TEST(SetParserTest, ThrowsOnTrailingGarbage)
 {
     EXPECT_THROW(SetParser::parse("{a} x"), std::invalid_argument);
 }
+
+TEST(SetParserTest, ThrowsOnMissingComma)
+{
+    EXPECT_THROW(SetParser::parse("{a b}"), std::invalid_argument);
+}

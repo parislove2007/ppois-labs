@@ -250,3 +250,15 @@ TEST(RectangleTest, PostfixDecrementReturnsOldValue)
     EXPECT_EQ(returned, Rectangle({1, 2}, {5, 7}));
     EXPECT_EQ(rectangle, Rectangle({1, 2}, {4, 6}));
 }
+
+TEST(RectangleTest, MinusDoesNotModifyOperands)
+{
+    Rectangle first({0, 0}, {5, 5});
+    Rectangle second({3, 3}, {10, 10});
+
+    Rectangle result = first - second;
+
+    EXPECT_EQ(result, Rectangle({3, 3}, {5, 5}));
+    EXPECT_EQ(first, Rectangle({0, 0}, {5, 5}));
+    EXPECT_EQ(second, Rectangle({3, 3}, {10, 10}));
+}

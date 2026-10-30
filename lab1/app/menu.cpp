@@ -1,8 +1,8 @@
 #include "menu.h"
-#include "set_parser.h"
 #include <iostream>
-#include <string>
 #include <stdexcept>
+#include <string>
+#include "set_parser.h"
 
 Menu::Menu(std::istream& input, std::ostream& output)
     : input_(input), output_(output), rectangle_({0, 0}, {1, 1}) {}
@@ -12,28 +12,16 @@ void Menu::run()
     while (true)
     {
         showMainMenu();
-
         int choice = 0;
-        if (!(input_ >> choice))
+        if (!(input_ >> choice) || choice == 0)
         {
             return;
         }
-
-        if (choice == 0)
+        switch (choice)
         {
-            return;
-        }
-        else if (choice == 1)
-        {
-            runRectangleMenu();
-        }
-        else if (choice == 2)
-        {
-            runSetMenu();
-        }
-        else
-        {
-            output_ << "Неизвестный пункт\n";
+            case 1: runRectangleMenu(); break;
+            case 2: runSetMenu();       break;
+            default: output_ << "Неизвестный пункт\n"; break;
         }
     }
 }
@@ -43,65 +31,28 @@ void Menu::showMainMenu()
     output_ << "\n1. Прямоугольник\n2. Множество\n0. Выход\nВыбор: ";
 }
 
+void Menu::showRectangleMenu()
+{
+    output_ << "\n--- Прямоугольник ---\n";
+    output_ << "Текущий: " << rectangle_ << "\n";
+    output_ << "1. Задать координаты\n2. Переместить\n3. Изменить размер\n";
+    output_ << "4. Увеличить на единицу\n5. Уменьшить на единицу\n";
+    output_ << "6. Объединить с другим\n7. Пересечь с другим\n0. Назад\nВыбор: ";
+}
+
 void Menu::runRectangleMenu()
 {
     while (true)
     {
-        output_ << "\n--- Прямоугольник ---\n";
-        output_ << "Текущий: " << rectangle_ << "\n";
-        output_ << "1. Задать координаты\n2. Переместить\n3. Изменить размер\n";
-        output_ << "4. Увеличить на единицу\n5. Уменьшить на единицу\n";
-        output_ << "6. Объединить с другим\n7. Пересечь с другим\n0. Назад\nВыбор: ";
-
+        showRectangleMenu();
         int choice = 0;
         if (!(input_ >> choice) || choice == 0)
         {
             return;
         }
-
         try
         {
-            if (choice == 1)
-            {
-                int left = 0, bottom = 0, right = 0, top = 0;
-                output_ << "Введите left bottom right top: ";
-                input_ >> left >> bottom >> right >> top;
-                rectangle_ = Rectangle({left, bottom}, {right, top});
-            }
-            else if (choice == 2)
-            {
-                int deltaX = 0, deltaY = 0;
-                output_ << "Введите сдвиг по x и y: ";
-                input_ >> deltaX >> deltaY;
-                rectangle_.move(deltaX, deltaY);
-            }
-            else if (choice == 3)
-            {
-                int width = 0, height = 0;
-                output_ << "Введите ширину и высоту: ";
-                input_ >> width >> height;
-                rectangle_.resize(width, height);
-            }
-            else if (choice == 4)
-            {
-                ++rectangle_;
-            }
-            else if (choice == 5)
-            {
-                --rectangle_;
-            }
-            else if (choice == 6 || choice == 7)
-            {
-                int left = 0, bottom = 0, right = 0, top = 0;
-                output_ << "Введите второй прямоугольник (left bottom right top): ";
-                input_ >> left >> bottom >> right >> top;
-                Rectangle other({left, bottom}, {right, top});
-                rectangle_ = (choice == 6) ? rectangle_ + other : rectangle_ - other;
-            }
-            else
-            {
-                output_ << "Неизвестный пункт\n";
-            }
+            handleRectangleChoice(choice);
         }
         catch (const std::exception& error)
         {
@@ -110,17 +61,76 @@ void Menu::runRectangleMenu()
     }
 }
 
+void Menu::handleRectangleChoice(int choice)
+{
+    switch (choice)
+    {
+        case 1: readRectangle();          break;
+        case 2: moveRectangle();          break;
+        case 3: resizeRectangle();        break;
+        case 4: ++rectangle_;             break;
+        case 5: --rectangle_;             break;
+        case 6: combineRectangles(false); break;
+        case 7: combineRectangles(true);  break;
+        default: output_ << "Неизвестный пункт\n"; break;
+    }
+}
+
+Rectangle Menu::readRectangleValue()
+{
+    int left = 0;
+    int bottom = 0;
+    int right = 0;
+    int top = 0;
+    input_ >> left >> bottom >> right >> top;
+    return Rectangle({left, bottom}, {right, top});
+}
+
+void Menu::readRectangle()
+{
+    output_ << "Введите left bottom right top: ";
+    rectangle_ = readRectangleValue();
+}
+
+void Menu::moveRectangle()
+{
+    int deltaX = 0;
+    int deltaY = 0;
+    output_ << "Введите сдвиг по x и y: ";
+    input_ >> deltaX >> deltaY;
+    rectangle_.move(deltaX, deltaY);
+}
+
+void Menu::resizeRectangle()
+{
+    int width = 0;
+    int height = 0;
+    output_ << "Введите ширину и высоту: ";
+    input_ >> width >> height;
+    rectangle_.resize(width, height);
+}
+
+void Menu::combineRectangles(bool intersect)
+{
+    output_ << "Введите второй прямоугольник (left bottom right top): ";
+    Rectangle other = readRectangleValue();
+    rectangle_ = intersect ? rectangle_ - other : rectangle_ + other;
+}
+
+void Menu::showSetMenu()
+{
+    output_ << "\n--- Множество ---\n";
+    output_ << "Текущее: " << set_ << "\n";
+    output_ << "1. Задать из строки\n2. Добавить элемент\n3. Удалить элемент\n";
+    output_ << "4. Мощность\n5. Проверить принадлежность\n";
+    output_ << "6. Объединение\n7. Пересечение\n8. Разность\n9. Булеан\n0. Назад\nВыбор: ";
+}
+
 void Menu::runSetMenu()
 {
     while (true)
     {
-        output_ << "\n--- Множество ---\n";
-
-        output_ << "Текущее: " << set_ << "\n";
-        output_ << "1. Задать из строки\n2. Добавить элемент\n3. Удалить элемент\n";
-        output_ << "4. Мощность\n5. Проверить принадлежность\n";
-        output_ << "6. Объединение\n7. Пересечение\n8. Разность\n9. Булеан\n0. Назад\nВыбор: ";
-
+        showSetMenu();
         int choice = 0;
         if (!(input_ >> choice) || choice == 0)
         {
@@ -128,71 +138,98 @@ void Menu::runSetMenu()
         }
         try
         {
-            if (choice == 1)
-            {
-                std::string text;
-                output_ << "Введите множество, например {a, b, {c}}: ";
-                input_ >> std::ws;
-                std::getline(input_, text);
-                set_ = SetParser::parse(text);
-            }
-            else if (choice == 2||choice == 3 || choice == 5)
-            {
-                std::string atom;
-                output_ << "Введите элемент: ";
-                input_ >> atom;
-                SetElement element(atom);
-
-                if (choice==2)
-                {
-                    set_.add(element);
-                }
-                else if (choice==3)
-                {
-                    set_.remove(element);
-                }
-                else
-                {
-                    output_ << (set_[element] ? "Принадлежит\n" : "Не принадлежит\n");
-                }
-            }
-            else if (choice == 4)
-            {
-                output_ << "Мощность: " << set_.size() << "\n";
-            }
-            else if (choice >= 6 && choice <= 8)
-            {
-                std::string text;
-                output_ << "Введите второе множество: ";
-                input_ >> std::ws;
-                std::getline(input_, text);
-                Set other = SetParser::parse(text);
-
-                if (choice == 6)
-                {
-                    set_ += other;
-                }
-                else if (choice == 7)
-                {
-                    set_ *= other;
-                }
-                else
-                {
-                    set_ -= other;
-                }
-            }
-            else if (choice == 9)
-            {
-                output_<<"Булеан: "<<set_.powerSet()<<"\n";
-            }
-            else
-            {
-                output_<<"Неизвестный пункт\n";
-            }
+            handleSetChoice(choice);
         }
         catch (const std::exception& error)
         {
-            output_<<"Ошибка: "<<error.what()<<"\n";
+            output_ << "Ошибка: " << error.what() << "\n";
         }
     }
+}
+
+void Menu::handleSetChoice(int choice)
+{
+    switch (choice)
+    {
+        case 1: readSet();           break;
+        case 2: addElement();        break;
+        case 3: removeElement();     break;
+        case 4: showCardinality();   break;
+        case 5: checkMembership();   break;
+        case 6:
+        case 7:
+        case 8: combineSets(choice); break;
+        case 9: showPowerSet();      break;
+        default: output_ << "Неизвестный пункт\n"; break;
+    }
+}
+
+Set Menu::readSetValue()
+{
+    std::string text;
+    input_ >> std::ws;
+    std::getline(input_, text);
+    return SetParser::parse(text);
+}
+
+SetElement Menu::readElement()
+{
+    std::string atom;
+    output_ << "Введите элемент: ";
+    input_ >> atom;
+    return SetElement(atom);
+}
+
+void Menu::readSet()
+{
+    output_ << "Введите множество, например {a, b, {c}}: ";
+    set_ = readSetValue();
+}
+
+void Menu::addElement()
+{
+    SetElement element = readElement();
+    set_.add(element);
+}
+
+void Menu::removeElement()
+{
+    SetElement element = readElement();
+    set_.remove(element);
+}
+
+void Menu::showCardinality()
+{
+    output_ << "Мощность: " << set_.size() << "\n";
+}
+
+void Menu::checkMembership()
+{
+    SetElement element = readElement();
+    output_ << (set_[element] ? "Принадлежит\n" : "Не принадлежит\n");
+}
+
+void Menu::combineSets(int choice)
+{
+    output_ << "Введите второе множество: ";
+    Set other = readSetValue();
+
+    if (choice == 6)
+    {
+        set_ += other;
+    }
+    else if (choice == 7)
+    {
+        set_ *= other;
+    }
+    else
+    {
+        set_ -= other;
+    }
+}
+
+void Menu::showPowerSet()
+{
+    Set result = set_.powerSet();
+    output_ << "Булеан: " << result << "\n";
 }

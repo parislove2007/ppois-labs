@@ -76,3 +76,5 @@ build/
 
 coverage.*
 build-cov/
+
+lab1/docs/

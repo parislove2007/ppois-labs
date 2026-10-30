@@ -168,3 +168,85 @@ TEST(RectangleTest, EmptyRectangleIsEmpty)
     EXPECT_TRUE(Rectangle:: empty().isEmpty());
     EXPECT_FALSE(Rectangle({0,0},{1,1}).isEmpty());
 }
+
+TEST(RectangleTest, EmptyRectangleIgnoresOperations)
+{
+    Rectangle empty = Rectangle::empty();
+
+    empty.move(5, 5);
+    empty.resize(10, 10);
+    ++empty;
+    --empty;
+
+    EXPECT_TRUE(empty.isEmpty());
+}
+
+TEST(RectangleTest, EmptyRectanglesAreEqual)
+{
+    EXPECT_EQ(Rectangle::empty(), Rectangle::empty());
+    EXPECT_NE(Rectangle::empty(), Rectangle({0, 0}, {1, 1}));
+}
+
+TEST(RectangleTest, UnionWithEmptyKeepsNonEmpty)
+{
+    Rectangle rectangle({0, 0}, {5, 5});
+    rectangle += Rectangle::empty();
+
+    EXPECT_EQ(rectangle, Rectangle({0, 0}, {5, 5}));
+
+    Rectangle empty = Rectangle::empty();
+    empty += rectangle;
+
+    EXPECT_EQ(empty, Rectangle({0, 0}, {5, 5}));
+}
+
+TEST(RectangleTest, IntersectionBuildsCommonPart)
+{
+    Rectangle rectangle({0, 0}, {5, 5});
+    rectangle -= Rectangle({3, 3}, {10, 10});
+
+    EXPECT_EQ(rectangle, Rectangle({3, 3}, {5, 5}));
+}
+
+TEST(RectangleTest, IntersectionOfDisjointIsEmpty)
+{
+    Rectangle rectangle({0, 0}, {2, 2});
+    rectangle -= Rectangle({10, 10}, {12, 12});
+
+    EXPECT_TRUE(rectangle.isEmpty());
+}
+
+TEST(RectangleTest, IntersectionWithEmptyIsEmpty)
+{
+    Rectangle rectangle({0, 0}, {5, 5});
+    rectangle -= Rectangle::empty();
+
+    EXPECT_TRUE(rectangle.isEmpty());
+}
+
+TEST(RectangleTest, WritesEmptyRectangle)
+{
+    std::ostringstream output;
+    output << Rectangle::empty();
+
+    EXPECT_EQ(output.str(), "empty");
+}
+
+TEST(RectangleTest, PrefixIncrementReturnsNewValue)
+{
+    Rectangle rectangle({1, 2}, {5, 7});
+
+    Rectangle returned = ++rectangle;
+
+    EXPECT_EQ(returned, Rectangle({1, 2}, {6, 8}));
+}
+
+TEST(RectangleTest, PostfixDecrementReturnsOldValue)
+{
+    Rectangle rectangle({1, 2}, {5, 7});
+
+    Rectangle returned = rectangle--;
+
+    EXPECT_EQ(returned, Rectangle({1, 2}, {5, 7}));
+    EXPECT_EQ(rectangle, Rectangle({1, 2}, {4, 6}));
+}

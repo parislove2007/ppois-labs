@@ -33,14 +33,7 @@ bool Set:: isEmpty() const
 
 bool Set::contains(const SetElement& element) const
 {
-    for (const SetElement& current : elements_)
-    {
-        if (current == element)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::find(elements_.begin(), elements_.end(), element) != elements_.end();
 }
 
 void Set::add(const SetElement& element)

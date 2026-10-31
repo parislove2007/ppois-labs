@@ -174,10 +174,23 @@ Set Menu::readSetValue()
 
 SetElement Menu::readElement()
 {
-    std::string atom;
+    std::string text;
     output_ << "Введите элемент: ";
-    input_ >> atom;
-    return SetElement(atom);
+    input_ >> std::ws;
+    std::getline(input_, text);
+
+    const std::size_t end = text.find_last_not_of(" \t");
+    if (end != std::string::npos)
+    {
+        text.erase(end + 1);
+    }
+
+    if (!text.empty() && text.front() == '{')
+    {
+        return SetElement(SetParser::parse(text));
+    }
+
+    return SetElement(text);
 }
 
 void Menu::readSet()

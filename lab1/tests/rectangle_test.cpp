@@ -1,0 +1,264 @@
+#include <gtest/gtest.h>
+#include "rectangle.h"
+#include <sstream>
+#include "point.h"
+#include <stdexcept>
+
+TEST(RectangleTest, StoresCoordinates)
+{
+    Rectangle rectangle ({0,0},{10,5});
+    
+    EXPECT_EQ(rectangle.bottomLeft(),Point(0,0));
+    EXPECT_EQ(rectangle.topLeft(),Point(0,5));
+    EXPECT_EQ(rectangle.bottomRight(),Point(10,0));
+}
+
+
+TEST(RectangleTest, EqualityComparesBothCorners)
+{
+    Rectangle first{{0, 0}, {10, 5}};
+    Rectangle same{{0, 0}, {10, 5}};
+    Rectangle different{{0, 0}, {10, 6}};
+    
+    EXPECT_EQ(first, same);
+    EXPECT_NE(first, different);
+}
+
+TEST(RectangleTest, ReadsFromStream)
+{
+    std::istringstream input("3 5 10 12");
+    Rectangle rectangle({0,0},{0,0});
+
+    input >> rectangle;
+
+    EXPECT_EQ(rectangle, Rectangle({3,5},{10,12}));
+}
+
+TEST(RectangleTest, WritesToStream)
+{
+    Rectangle rectangle({3,5},{11,15});
+    std::ostringstream output;
+
+    output << rectangle;
+
+    EXPECT_EQ(output.str(), "3 5 11 15");
+}
+
+TEST(RectangleTest, FailsOnInvalidInput)
+{
+    std::istringstream input("2 abc");
+    Rectangle rectangle({3,5},{10,12});
+    input >> rectangle;
+    EXPECT_TRUE(input.fail());
+    EXPECT_EQ(rectangle,Rectangle({3,5},{10,12}));
+}
+
+TEST(RectangleTest, SurvivesRoundTrip)
+{
+    Rectangle original({3,5},{15,12});
+    std::ostringstream output;
+    output << original;
+
+    std::istringstream input(output.str());
+    Rectangle restored({0,0},{10,1});
+    input >> restored;
+
+    EXPECT_EQ(restored, original);
+}
+
+TEST (RectangleTest,RectangleMoves )
+{
+    Rectangle rectangle ({0,0},{3,7});
+    rectangle.move(5,9);
+    EXPECT_EQ(rectangle,Rectangle({5,9},{8,16}));
+}
+
+TEST (RectangleTest, RectangleResize)
+{
+    Rectangle rectangle ({3,5},{10,7});
+    rectangle.resize(15,16);
+    EXPECT_EQ(rectangle,Rectangle({3,5},{18,21}));
+    EXPECT_THROW(rectangle.resize(-5, 3), std::invalid_argument);
+}
+
+TEST (RectangleTest, PrefixIncrement)
+{
+    Rectangle rectangle({1,2},{5,7});
+    ++rectangle;
+    EXPECT_EQ(rectangle, Rectangle({1,2},{6,8}));
+}
+
+TEST (RectangleTest, PostfixIncrement)
+{
+    Rectangle rectangle({1,2},{6,7});
+    rectangle++;
+    EXPECT_EQ(rectangle, Rectangle({1,2},{7,8}));
+}
+
+TEST (RectangleTest, PrefixDecrement)
+{
+    Rectangle rectangle({4,5},{9,12});
+    --rectangle;
+    EXPECT_EQ(rectangle, Rectangle ({4,5},{8,11}));
+}
+
+TEST (RectangleTest, PostfixDecrement)
+{
+    Rectangle rectangle({4,5},{10,15});
+    rectangle--;
+    EXPECT_EQ(rectangle, Rectangle({4,5},{9,14}));
+}
+
+TEST(RectangleTest, PostfixIncrementReturnsOldValue)
+{
+    Rectangle rectangle({1, 2}, {6, 7});
+
+    Rectangle returned = rectangle++;
+
+    EXPECT_EQ(returned, Rectangle({1, 2}, {6, 7})); 
+    EXPECT_EQ(rectangle, Rectangle({1, 2}, {7, 8})); 
+}
+
+TEST(RectangleTest, PrefixDecrementThrowRectangle)
+{
+    Rectangle rectangle({0, 0}, {0, 0});
+
+    EXPECT_THROW(--rectangle, std::invalid_argument);
+}
+
+TEST(RectangleTest, PostfixDecrementThrowRectangle)
+{
+    Rectangle rectangle({0, 0}, {0, 0});
+
+    EXPECT_THROW(rectangle--, std::invalid_argument);
+}
+
+TEST(RectangleTest, PlusEqualsBuildsBoundingBox)
+{
+    Rectangle rectangle({0,0}, {5,5});
+    Rectangle other ({3,3}, {10,10});
+
+    rectangle += other;
+    EXPECT_EQ(rectangle, Rectangle({0,0}, {10,10}));
+}
+
+TEST(RectangleTest, PlusDoesNotModifyOperands)
+{
+    Rectangle first({0,0}, {5,5});
+    Rectangle second({3,3},{10,10});
+    Rectangle result = first + second;
+
+    EXPECT_EQ(result, Rectangle({0,0},{10,10}));
+    EXPECT_EQ(first, Rectangle({0,0},{5,5}));
+    EXPECT_EQ(second, Rectangle({3,3},{10,10}));
+}
+
+TEST(RectangleTest, PlusEqualsKeepsOuterWhenNested)
+{
+    Rectangle outer {{0,0},{10,10}};
+    Rectangle inner {{2,2}, {5,5}};
+
+    outer += inner;
+
+    EXPECT_EQ(outer, Rectangle({0,0}, {10,10}));
+}
+
+TEST(RectangleTest, EmptyRectangleIsEmpty)
+{
+    EXPECT_TRUE(Rectangle:: empty().isEmpty());
+    EXPECT_FALSE(Rectangle({0,0},{1,1}).isEmpty());
+}
+
+TEST(RectangleTest, EmptyRectangleIgnoresOperations)
+{
+    Rectangle empty = Rectangle::empty();
+
+    empty.move(5, 5);
+    empty.resize(10, 10);
+    ++empty;
+    --empty;
+
+    EXPECT_TRUE(empty.isEmpty());
+}
+
+TEST(RectangleTest, EmptyRectanglesAreEqual)
+{
+    EXPECT_EQ(Rectangle::empty(), Rectangle::empty());
+    EXPECT_NE(Rectangle::empty(), Rectangle({0, 0}, {1, 1}));
+}
+
+TEST(RectangleTest, UnionWithEmptyKeepsNonEmpty)
+{
+    Rectangle rectangle({0, 0}, {5, 5});
+    rectangle += Rectangle::empty();
+
+    EXPECT_EQ(rectangle, Rectangle({0, 0}, {5, 5}));
+
+    Rectangle empty = Rectangle::empty();
+    empty += rectangle;
+
+    EXPECT_EQ(empty, Rectangle({0, 0}, {5, 5}));
+}
+
+TEST(RectangleTest, IntersectionBuildsCommonPart)
+{
+    Rectangle rectangle({0, 0}, {5, 5});
+    rectangle -= Rectangle({3, 3}, {10, 10});
+
+    EXPECT_EQ(rectangle, Rectangle({3, 3}, {5, 5}));
+}
+
+TEST(RectangleTest, IntersectionOfDisjointIsEmpty)
+{
+    Rectangle rectangle({0, 0}, {2, 2});
+    rectangle -= Rectangle({10, 10}, {12, 12});
+
+    EXPECT_TRUE(rectangle.isEmpty());
+}
+
+TEST(RectangleTest, IntersectionWithEmptyIsEmpty)
+{
+    Rectangle rectangle({0, 0}, {5, 5});
+    rectangle -= Rectangle::empty();
+
+    EXPECT_TRUE(rectangle.isEmpty());
+}
+
+TEST(RectangleTest, WritesEmptyRectangle)
+{
+    std::ostringstream output;
+    output << Rectangle::empty();
+
+    EXPECT_EQ(output.str(), "empty");
+}
+
+TEST(RectangleTest, PrefixIncrementReturnsNewValue)
+{
+    Rectangle rectangle({1, 2}, {5, 7});
+
+    Rectangle returned = ++rectangle;
+
+    EXPECT_EQ(returned, Rectangle({1, 2}, {6, 8}));
+}
+
+TEST(RectangleTest, PostfixDecrementReturnsOldValue)
+{
+    Rectangle rectangle({1, 2}, {5, 7});
+
+    Rectangle returned = rectangle--;
+
+    EXPECT_EQ(returned, Rectangle({1, 2}, {5, 7}));
+    EXPECT_EQ(rectangle, Rectangle({1, 2}, {4, 6}));
+}
+
+TEST(RectangleTest, MinusDoesNotModifyOperands)
+{
+    Rectangle first({0, 0}, {5, 5});
+    Rectangle second({3, 3}, {10, 10});
+
+    Rectangle result = first - second;
+
+    EXPECT_EQ(result, Rectangle({3, 3}, {5, 5}));
+    EXPECT_EQ(first, Rectangle({0, 0}, {5, 5}));
+    EXPECT_EQ(second, Rectangle({3, 3}, {10, 10}));
+}

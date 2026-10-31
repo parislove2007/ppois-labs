@@ -111,6 +111,13 @@ ctest --test-dir build-cov
 gcovr --root . --filter 'lab1/src/' --print-summary build-cov
 ```
 
+То же самое одной строкой — собрать, прогнать тесты и показать
+покрытие:
+
+```sh
+cmake -S lab1 -B build-cov -DENABLE_COVERAGE=ON && cmake --build build-cov && ctest --test-dir build-cov && gcovr --root . --filter 'lab1/src/' --print-summary build-cov
+```
+
 Та же проверка с порогом, которую выполняет CI — завершается
 ошибкой, если покрытие строк ниже 90%:
 

@@ -45,6 +45,10 @@ add_library(lab2_core STATIC
     src/people/Employee.cpp
     src/people/Manager.cpp
     src/people/Technician.cpp
+    src/registry/ClientRegistry.cpp
+    src/registry/EmployeeRegistry.cpp
+    src/registry/OrderBook.cpp
+    src/registry/PartCatalog.cpp
     src/repair/Defect.cpp
     src/repair/Device.cpp
     src/repair/Diagnostics.cpp
@@ -60,6 +64,11 @@ add_library(lab2_core STATIC
     src/schedule/Appointment.cpp
     src/schedule/TimeSlot.cpp
     src/schedule/WorkSchedule.cpp
+    src/service/InventoryService.cpp
+    src/service/OrderService.cpp
+    src/service/PricingService.cpp
+    src/service/SchedulingService.cpp
+    src/service/WarrantyService.cpp
     src/stock/PartReservation.cpp
     src/stock/StockItem.cpp
     src/stock/Supplier.cpp
@@ -91,8 +100,10 @@ add_executable(lab2_tests
     tests/error_test.cpp
     tests/finance_test.cpp
     tests/people_test.cpp
+    tests/registry_test.cpp
     tests/repair_test.cpp
     tests/schedule_test.cpp
+    tests/service_test.cpp
     tests/stock_test.cpp
     tests/value_test.cpp
 )

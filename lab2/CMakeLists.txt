@@ -95,6 +95,13 @@ endif()
 
 target_include_directories(lab2_core PUBLIC include)
 
+add_executable(lab2_app
+    app/ConsoleMenu.cpp
+    app/main.cpp
+)
+target_include_directories(lab2_app PRIVATE app)
+target_link_libraries(lab2_app PRIVATE lab2_core)
+
 add_executable(lab2_tests
     tests/catalog_test.cpp
     tests/error_test.cpp

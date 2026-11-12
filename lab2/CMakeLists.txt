@@ -15,6 +15,13 @@ enable_testing()
 include(GoogleTest)
 
 add_library(lab2_core STATIC
+    src/catalog/DeviceCategory.cpp
+    src/catalog/DeviceModel.cpp
+    src/catalog/Manufacturer.cpp
+    src/catalog/Part.cpp
+    src/catalog/PriceList.cpp
+    src/catalog/PriceListEntry.cpp
+    src/catalog/ServiceType.cpp
     src/error/BusinessRuleException.cpp
     src/error/ClientNotFoundException.cpp
     src/error/EstimateNotApprovedException.cpp
@@ -50,6 +57,7 @@ endif()
 target_include_directories(lab2_core PUBLIC include)
 
 add_executable(lab2_tests
+    tests/catalog_test.cpp
     tests/error_test.cpp
     tests/value_test.cpp
 )

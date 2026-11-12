@@ -36,6 +36,10 @@ add_library(lab2_core STATIC
     src/error/RepairException.cpp
     src/error/ValidationException.cpp
     src/error/WarrantyExpiredException.cpp
+    src/finance/Discount.cpp
+    src/finance/Invoice.cpp
+    src/finance/InvoiceLine.cpp
+    src/finance/Payment.cpp
     src/people/Client.cpp
     src/people/CorporateClient.cpp
     src/people/Employee.cpp
@@ -53,6 +57,9 @@ add_library(lab2_core STATIC
     src/repair/Warranty.cpp
     src/repair/WarrantyClaim.cpp
     src/repair/WorkItem.cpp
+    src/schedule/Appointment.cpp
+    src/schedule/TimeSlot.cpp
+    src/schedule/WorkSchedule.cpp
     src/stock/PartReservation.cpp
     src/stock/StockItem.cpp
     src/stock/Supplier.cpp
@@ -82,8 +89,10 @@ target_include_directories(lab2_core PUBLIC include)
 add_executable(lab2_tests
     tests/catalog_test.cpp
     tests/error_test.cpp
+    tests/finance_test.cpp
     tests/people_test.cpp
     tests/repair_test.cpp
+    tests/schedule_test.cpp
     tests/stock_test.cpp
     tests/value_test.cpp
 )

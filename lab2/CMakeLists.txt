@@ -29,6 +29,15 @@ add_library(lab2_core STATIC
     src/error/RepairException.cpp
     src/error/ValidationException.cpp
     src/error/WarrantyExpiredException.cpp
+    src/value/Address.cpp
+    src/value/Date.cpp
+    src/value/Duration.cpp
+    src/value/EmailAddress.cpp
+    src/value/Money.cpp
+    src/value/Percentage.cpp
+    src/value/PersonName.cpp
+    src/value/PhoneNumber.cpp
+    src/value/SerialNumber.cpp
 )
 
 option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
@@ -42,6 +51,7 @@ target_include_directories(lab2_core PUBLIC include)
 
 add_executable(lab2_tests
     tests/error_test.cpp
+    tests/value_test.cpp
 )
 target_link_libraries(lab2_tests PRIVATE lab2_core GTest::gtest_main)
 gtest_discover_tests(lab2_tests)

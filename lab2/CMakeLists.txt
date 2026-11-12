@@ -41,6 +41,18 @@ add_library(lab2_core STATIC
     src/people/Employee.cpp
     src/people/Manager.cpp
     src/people/Technician.cpp
+    src/repair/Defect.cpp
+    src/repair/Device.cpp
+    src/repair/Diagnostics.cpp
+    src/repair/Estimate.cpp
+    src/repair/IntakeAct.cpp
+    src/repair/OrderHistoryEntry.cpp
+    src/repair/OrderStatus.cpp
+    src/repair/PartUsage.cpp
+    src/repair/RepairOrder.cpp
+    src/repair/Warranty.cpp
+    src/repair/WarrantyClaim.cpp
+    src/repair/WorkItem.cpp
     src/value/Address.cpp
     src/value/Date.cpp
     src/value/Duration.cpp
@@ -65,6 +77,7 @@ add_executable(lab2_tests
     tests/catalog_test.cpp
     tests/error_test.cpp
     tests/people_test.cpp
+    tests/repair_test.cpp
     tests/value_test.cpp
 )
 target_link_libraries(lab2_tests PRIVATE lab2_core GTest::gtest_main)

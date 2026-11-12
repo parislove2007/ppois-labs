@@ -19,20 +19,38 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++ gcovr cppcheck
 
-      - name: Configure
+      - name: Configure lab1
         run: cmake -S lab1 -B build -DENABLE_COVERAGE=ON
 
-      - name: Build
+      - name: Build lab1
         run: cmake --build build
 
-      - name: Run tests
+      - name: Run lab1 tests
         run: ctest --test-dir build --output-on-failure
 
-      - name: Check coverage
+      - name: Check lab1 coverage
         run: gcovr --root . --filter 'lab1/src/' --fail-under-line 90 --print-summary build
 
-      - name: Static analysis
+      - name: Static analysis of lab1
         run: cppcheck --enable=warning,style --error-exitcode=1 --suppress=missingIncludeSystem lab1/src lab1/include
+
+      - name: Configure lab2
+        run: cmake -S lab2 -B build2 -DENABLE_COVERAGE=ON
+
+      - name: Build lab2
+        run: cmake --build build2
+
+      - name: Run lab2 tests
+        run: ctest --test-dir build2 --output-on-failure
+
+      - name: Check lab2 coverage
+        run: gcovr --root . --filter 'lab2/src/' --fail-under-line 90 --print-summary build2
+
+      - name: Static analysis of lab2
+        run: cppcheck --enable=warning,style --error-exitcode=1 --suppress=missingIncludeSystem lab2/src lab2/include
+
+      - name: Check lab2 model metrics
+        run: python3 lab2/tools/metrics.py
 
   release:
     runs-on: ubuntu-latest
@@ -50,17 +68,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++
 
-      - name: Build release binary
+      - name: Build release binaries
         run: |
           cmake -S lab1 -B build-release \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_EXE_LINKER_FLAGS="-static"
           cmake --build build-release --target lab1_app
+          cmake -S lab2 -B build-release-lab2 \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_EXE_LINKER_FLAGS="-static"
+          cmake --build build-release-lab2 --target lab2_app
 
       - name: Check the binary is self-contained
         run: |
-          file build-release/lab1_app
-          ldd build-release/lab1_app || echo "статически слинкован, внешних зависимостей нет"
+          file build-release/lab1_app build-release-lab2/lab2_app
+          ldd build-release/lab1_app || echo "lab1_app статически слинкован"
+          ldd build-release-lab2/lab2_app || echo "lab2_app статически слинкован"
 
       - name: Determine release name
         id: meta
@@ -81,6 +104,7 @@ jobs:
         run: |
           gh release create "${{ steps.meta.outputs.tag }}" \
              build-release/lab1_app \
+             build-release-lab2/lab2_app \
              --title "${{ steps.meta.outputs.title }}" \
-             --notes "Консольное приложение: прямоугольник и множество. Статически слинкованный бинарный файл для Linux x86-64." \
+             --notes "Консольные приложения лабораторных работ 1 и 2. Статически слинкованные бинарные файлы для Linux x86-64." \
              ${{ steps.meta.outputs.flags }}

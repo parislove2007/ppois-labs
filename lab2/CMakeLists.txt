@@ -36,6 +36,11 @@ add_library(lab2_core STATIC
     src/error/RepairException.cpp
     src/error/ValidationException.cpp
     src/error/WarrantyExpiredException.cpp
+    src/people/Client.cpp
+    src/people/CorporateClient.cpp
+    src/people/Employee.cpp
+    src/people/Manager.cpp
+    src/people/Technician.cpp
     src/value/Address.cpp
     src/value/Date.cpp
     src/value/Duration.cpp
@@ -59,6 +64,7 @@ target_include_directories(lab2_core PUBLIC include)
 add_executable(lab2_tests
     tests/catalog_test.cpp
     tests/error_test.cpp
+    tests/people_test.cpp
     tests/value_test.cpp
 )
 target_link_libraries(lab2_tests PRIVATE lab2_core GTest::gtest_main)

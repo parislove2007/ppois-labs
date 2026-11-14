@@ -80,3 +80,7 @@ build-cov/
 lab1/docs/
 # Каталоги сборки lab2
 build2/
+
+__pycache__/
+*.pyc
+docs/

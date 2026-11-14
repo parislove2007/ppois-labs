@@ -1,0 +1,20 @@
+# Minimal Doxygen configuration for lab 2.
+# Every option that is not listed here keeps its default value.
+# Generate the documentation from the lab2 directory: doxygen Doxyfile
+
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "Lab 2: Repair service center"
+OUTPUT_DIRECTORY       = docs
+OUTPUT_LANGUAGE        = English
+INPUT                  = include src README.md
+INPUT_ENCODING         = UTF-8
+FILE_PATTERNS          = *.h *.cpp *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+EXTRACT_ALL            = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HAVE_DOT               = NO
+CLASS_GRAPH            = YES
+SOURCE_BROWSER         = NO
+TIMESTAMP              = NO

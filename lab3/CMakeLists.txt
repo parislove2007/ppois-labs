@@ -19,6 +19,22 @@ add_library(lab3_core STATIC
     src/error/QuotaExceededException.cpp
     src/error/StorageFullException.cpp
     src/error/VersionConflictException.cpp
+    src/operations/CopyOperation.cpp
+    src/operations/CreateOperation.cpp
+    src/operations/DeleteOperation.cpp
+    src/operations/MoveOperation.cpp
+    src/operations/Operation.cpp
+    src/operations/OperationJournal.cpp
+    src/operations/RenameOperation.cpp
+    src/search/CompositeFilter.cpp
+    src/search/DateFilter.cpp
+    src/search/ExtensionFilter.cpp
+    src/search/NameFilter.cpp
+    src/search/SearchService.cpp
+    src/search/SizeFilter.cpp
+    src/search/TagFilter.cpp
+    src/service/FileManager.cpp
+    src/service/ReportService.cpp
     src/metadata/EntryVersion.cpp
     src/metadata/FileMetadata.cpp
     src/metadata/Tag.cpp
@@ -56,3 +72,10 @@ if(ENABLE_COVERAGE)
 endif()
 
 target_include_directories(lab3_core PUBLIC include)
+
+add_executable(lab3_app
+    app/ConsoleMenu.cpp
+    app/main.cpp
+)
+target_include_directories(lab3_app PRIVATE app)
+target_link_libraries(lab3_app PRIVATE lab3_core)

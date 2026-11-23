@@ -13,7 +13,7 @@ namespace fs
 class BinaryFile : public File
 {
 public:
-    using File::File;
+    BinaryFile(std::string name, std::string owner, Permission permission, Timestamp created);
 
     std::string kind() const override;
 
@@ -24,6 +24,12 @@ public:
      * @throws PermissionDeniedException Если нет права записи.
      */
     void append(const std::string& chunk, Timestamp at);
+
+    /** @return MIME-тип содержимого. */
+    const std::string& mimeType() const;
+
+private:
+    std::string mimeType_;
 };
 
 }

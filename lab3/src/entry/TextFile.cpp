@@ -3,6 +3,14 @@
 namespace fs
 {
 
+TextFile::TextFile(std::string name, std::string owner, Permission permission,
+                   Timestamp created)
+    : File(std::move(name), std::move(owner), permission, created),
+      encoding_("utf-8"),
+      lineEnding_("lf")
+{
+}
+
 std::string TextFile::kind() const
 {
     return "text";
@@ -23,6 +31,26 @@ int TextFile::lineCount() const
         }
     }
     return lines;
+}
+
+const std::string& TextFile::encoding() const
+{
+    return encoding_;
+}
+
+void TextFile::setEncoding(std::string encoding)
+{
+    encoding_ = std::move(encoding);
+}
+
+const std::string& TextFile::lineEnding() const
+{
+    return lineEnding_;
+}
+
+void TextFile::setLineEnding(std::string lineEnding)
+{
+    lineEnding_ = std::move(lineEnding);
 }
 
 int TextFile::wordCount() const

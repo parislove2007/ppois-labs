@@ -5,9 +5,21 @@
 namespace fs
 {
 
+BinaryFile::BinaryFile(std::string name, std::string owner, Permission permission,
+                       Timestamp created)
+    : File(std::move(name), std::move(owner), permission, created),
+      mimeType_("application/octet-stream")
+{
+}
+
 std::string BinaryFile::kind() const
 {
     return "binary";
+}
+
+const std::string& BinaryFile::mimeType() const
+{
+    return mimeType_;
 }
 
 void BinaryFile::append(const std::string& chunk, Timestamp at)

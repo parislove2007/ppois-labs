@@ -13,7 +13,7 @@ namespace fs
 class TextFile : public File
 {
 public:
-    using File::File;
+    TextFile(std::string name, std::string owner, Permission permission, Timestamp created);
 
     std::string kind() const override;
 
@@ -22,6 +22,20 @@ public:
 
     /** @return Количество слов в содержимом. */
     int wordCount() const;
+
+    /** @return Кодировка текста, по умолчанию «utf-8». */
+    const std::string& encoding() const;
+
+    /** @brief Меняет кодировку текста. */
+    void setEncoding(std::string encoding);
+
+    /** @return Стиль переводов строк: «lf» или «crlf». */
+    const std::string& lineEnding() const;
+    void setLineEnding(std::string lineEnding);
+
+private:
+    std::string encoding_;
+    std::string lineEnding_;
 };
 
 }

@@ -3,9 +3,24 @@
 namespace fs
 {
 
-EntryVersion::EntryVersion(int number, std::string content, Timestamp saved)
-    : number_(number), content_(std::move(content)), saved_(saved)
+EntryVersion::EntryVersion(int number, std::string content, Timestamp saved,
+                             std::string author, std::string comment)
+    : number_(number),
+      content_(std::move(content)),
+      saved_(saved),
+      author_(std::move(author)),
+      comment_(std::move(comment))
 {
+}
+
+const std::string& EntryVersion::author() const
+{
+    return author_;
+}
+
+const std::string& EntryVersion::comment() const
+{
+    return comment_;
 }
 
 int EntryVersion::number() const

@@ -2,15 +2,27 @@
 
 #include "error/EntryAlreadyExistsException.h"
 #include "error/PathNotFoundException.h"
+#include "error/StorageFullException.h"
 
 namespace fs
 {
+
+Directory::Directory(std::string name, std::string owner, Permission permission,
+                     Timestamp created, std::size_t entryLimit)
+    : FileSystemEntry(std::move(name), std::move(owner), permission, created),
+      entryLimit_(entryLimit)
+{
+}
 
 void Directory::add(std::unique_ptr<FileSystemEntry> entry, Timestamp at)
 {
     if (contains(entry->name()))
     {
         throw EntryAlreadyExistsException("Name already exists: " + entry->name());
+    }
+    if (entryLimit_ != 0 && entries_.size() >= entryLimit_)
+    {
+        throw StorageFullException("Directory is full: " + name_);
     }
     entries_.push_back(std::move(entry));
     touch(at);

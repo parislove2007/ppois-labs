@@ -32,11 +32,18 @@ public:
      */
     void retarget(Path newTarget, Timestamp at);
 
+    /** @brief Регистрирует переход по ссылке. */
+    void registerFollow();
+
+    /** @return Сколько раз переходили по ссылке. */
+    int followCount() const;
+
     FileSize size() const override;
     std::string describe() const override;
 
 private:
     Path target_;
+    int followCount_;
 };
 
 }

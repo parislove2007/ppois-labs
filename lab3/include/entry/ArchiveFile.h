@@ -14,7 +14,8 @@ namespace fs
 class ArchiveFile : public File
 {
 public:
-    using File::File;
+    ArchiveFile(std::string name, std::string owner, Permission permission,
+                Timestamp created);
 
     std::string kind() const override;
 
@@ -32,8 +33,22 @@ public:
     /** @return true, если запись с таким именем уже в архиве. */
     bool containsPacked(const std::string& entryName) const;
 
+    /** @return Уровень сжатия от одного до девяти. */
+    int compressionLevel() const;
+
+    /**
+     * @brief Меняет уровень сжатия.
+     * @throws FileSystemException Если уровень вне диапазона 1–9.
+     */
+    void setCompressionLevel(int level);
+
+    const std::string& comment() const;
+    void setComment(std::string comment);
+
 private:
     std::vector<std::string> packedNames_;
+    int compressionLevel_;
+    std::string comment_;
 };
 
 }

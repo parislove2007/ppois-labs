@@ -112,3 +112,23 @@ TEST(SearchTest, CompositeFilterCombinesPredicates)
     anyOf.add(std::make_unique<NameFilter>("photo"));
     EXPECT_EQ(SearchService().search(storage, anyOf).size(), 2u);
 }
+
+TEST(SearchTest, NameFilterIgnoresCaseWhenAllowed)
+{
+    Storage storage = makeSample();
+    const auto strict = SearchService().search(storage, NameFilter("NOTES", true));
+    EXPECT_TRUE(strict.empty());
+    const auto loose = SearchService().search(storage, NameFilter("NOTES", false));
+    EXPECT_EQ(pathsOf(loose), (std::vector<std::string>{"/docs/notes.txt"}));
+}
+
+TEST(SearchTest, DateFilterCanUseCreatedTimestamp)
+{
+    Storage storage = makeSample();
+    const auto createdEarly =
+        SearchService().search(storage, DateFilter(Timestamp::of(1), Timestamp::of(2), true));
+    EXPECT_EQ(createdEarly.size(), 2u);
+    const auto createdLate =
+        SearchService().search(storage, DateFilter(Timestamp::of(4), Timestamp::of(5), true));
+    EXPECT_TRUE(createdLate.empty());
+}

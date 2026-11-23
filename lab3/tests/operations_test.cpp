@@ -51,3 +51,16 @@ TEST(OperationJournalTest, CollectsAndFiltersEntries)
     EXPECT_EQ(journal.byKind("rename").size(), 0u);
     EXPECT_NE(journal.historyText().find("created /b"), std::string::npos);
 }
+
+TEST(OperationJournalTest, TrimsToLimit)
+{
+    OperationJournal journal(2);
+    for (int i = 0; i < 4; ++i)
+    {
+        journal.log(std::make_unique<CreateOperation>(Path::parse("/f" + std::to_string(i)),
+                                                      Timestamp::of(i)));
+    }
+    EXPECT_EQ(journal.count(), 2u);
+    EXPECT_EQ(journal.at(0).describe(), "created /f2");
+    EXPECT_EQ(journal.at(1).describe(), "created /f3");
+}

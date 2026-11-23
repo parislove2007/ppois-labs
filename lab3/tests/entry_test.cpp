@@ -9,9 +9,11 @@
 #include "entry/SymbolicLink.h"
 #include "entry/TextFile.h"
 #include "error/EntryAlreadyExistsException.h"
+#include "error/FileSystemException.h"
 #include "error/InvalidFileNameException.h"
 #include "error/PathNotFoundException.h"
 #include "error/PermissionDeniedException.h"
+#include "error/StorageFullException.h"
 #include "value/Path.h"
 #include "value/Permission.h"
 #include "value/Timestamp.h"
@@ -159,4 +161,51 @@ TEST(SymbolicLinkTest, PointsToTargetAndRetargets)
     EXPECT_EQ(link.target().toString(), "/docs/b.txt");
     EXPECT_EQ(link.size().bytes(), 0u);
     EXPECT_EQ(link.describe(), "[link] shortcut -> /docs/b.txt");
+}
+
+TEST(TextFileTest, TracksEncodingAndLineEnding)
+{
+    TextFile text("a.txt", "ivan", Permission::readWrite(), Timestamp::of(1));
+    EXPECT_EQ(text.encoding(), "utf-8");
+    EXPECT_EQ(text.lineEnding(), "lf");
+    text.setEncoding("cp1251");
+    text.setLineEnding("crlf");
+    EXPECT_EQ(text.encoding(), "cp1251");
+    EXPECT_EQ(text.lineEnding(), "crlf");
+}
+
+TEST(BinaryFileTest, ReportsMimeType)
+{
+    BinaryFile blob("data.bin", "ivan", Permission::readWrite(), Timestamp::of(1));
+    EXPECT_EQ(blob.mimeType(), "application/octet-stream");
+}
+
+TEST(ArchiveFileTest, ValidatesCompressionLevel)
+{
+    ArchiveFile archive("b.zip", "ivan", Permission::readWrite(), Timestamp::of(1));
+    EXPECT_EQ(archive.compressionLevel(), 6);
+    archive.setCompressionLevel(9);
+    EXPECT_EQ(archive.compressionLevel(), 9);
+    EXPECT_THROW(archive.setCompressionLevel(0), FileSystemException);
+    EXPECT_THROW(archive.setCompressionLevel(10), FileSystemException);
+    archive.setComment("nightly backup");
+    EXPECT_EQ(archive.comment(), "nightly backup");
+}
+
+TEST(DirectoryTest, EnforcesEntryLimit)
+{
+    Directory dir("docs", "ivan", Permission::readWrite(), Timestamp::of(1), 1);
+    dir.add(makeTextFilePtr("a.txt"), Timestamp::of(2));
+    EXPECT_THROW(dir.add(makeTextFilePtr("b.txt"), Timestamp::of(3)),
+                 StorageFullException);
+}
+
+TEST(SymbolicLinkTest, CountsFollows)
+{
+    SymbolicLink link("s", Path::parse("/a"), "ivan", Permission::readOnly(),
+                      Timestamp::of(1));
+    EXPECT_EQ(link.followCount(), 0);
+    link.registerFollow();
+    link.registerFollow();
+    EXPECT_EQ(link.followCount(), 2);
 }

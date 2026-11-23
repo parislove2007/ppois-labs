@@ -12,6 +12,7 @@
 #include "error/NotADirectoryException.h"
 #include "error/PathNotFoundException.h"
 #include "error/QuotaExceededException.h"
+#include "error/StorageFullException.h"
 #include "storage/BackupService.h"
 #include "storage/QuotaManager.h"
 #include "storage/Storage.h"
@@ -185,4 +186,49 @@ TEST(BackupServiceTest, RestoresOverwrittenContent)
     EXPECT_EQ(restored, 1u);
     FileSystemEntry& entry = storage.resolve(Path::parse("/docs/notes.txt"));
     EXPECT_EQ(dynamic_cast<TextFile&>(entry).read(), "hello");
+}
+
+TEST(StorageTest, EnforcesTotalCapacity)
+{
+    Storage storage(FileSize::fromBytes(10));
+    storage.ensureDirectory(Path::parse("/docs"), "ivan", Timestamp::of(1));
+    storage.attach(Path::parse("/docs/small.txt"), makeFile("small.txt", "12345"),
+                   Timestamp::of(2));
+    EXPECT_THROW(storage.attach(Path::parse("/docs/big.txt"), makeFile("big.txt", "1234567890"),
+                                Timestamp::of(3)),
+                 StorageFullException);
+}
+
+TEST(TrashBinTest, EnforcesLimitAndCounts)
+{
+    TrashBin trash(1);
+    trash.moveToTrash(Path::parse("/a"), makeFile("a", "a"));
+    EXPECT_THROW(trash.moveToTrash(Path::parse("/b"), makeFile("b", "b")),
+                 StorageFullException);
+    trash.restore(0);
+    EXPECT_EQ(trash.restoredCount(), 1u);
+    trash.moveToTrash(Path::parse("/c"), makeFile("c", "c"));
+    trash.clear();
+    EXPECT_EQ(trash.clearedCount(), 1u);
+    EXPECT_EQ(trash.itemCount(), 0u);
+}
+
+TEST(BackupServiceTest, DescribesLabeledSnapshot)
+{
+    Storage storage = makeSampleStorage();
+    BackupService backup;
+    backup.capture(storage, "before cleanup", Timestamp::of(50));
+    EXPECT_EQ(backup.label(), "before cleanup");
+    EXPECT_EQ(backup.createdAt().seconds(), 50);
+    backup.toggleEncryption();
+    EXPECT_TRUE(backup.isEncrypted());
+    EXPECT_NE(backup.describe().find("before cleanup"), std::string::npos);
+    EXPECT_NE(backup.describe().find("encrypted"), std::string::npos);
+}
+
+TEST(BackupRecordTest, VerifiesContent)
+{
+    const BackupRecord record(Path::parse("/a.txt"), "payload");
+    EXPECT_TRUE(record.verify("payload"));
+    EXPECT_FALSE(record.verify("tampered"));
 }

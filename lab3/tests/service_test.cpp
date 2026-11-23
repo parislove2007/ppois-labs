@@ -5,6 +5,12 @@
 #include <vector>
 
 #include "entry/TextFile.h"
+#include "error/FileSystemException.h"
+#include "service/SearchQuery.h"
+#include "service/ShareLink.h"
+#include "service/ShareService.h"
+#include "value/Clock.h"
+#include "error/NotADirectoryException.h"
 #include "error/NotAFileException.h"
 #include "error/PathNotFoundException.h"
 #include "error/PermissionDeniedException.h"
@@ -173,4 +179,90 @@ TEST(ReportServiceTest, RendersTreeAndSummary)
     const auto top = ReportService().topLargest(manager.storage(), 1);
     ASSERT_EQ(top.size(), 1u);
     EXPECT_EQ(top[0].first.toString(), "/docs/notes.txt");
+}
+
+TEST(SearchQueryTest, BuildsCombinedFilter)
+{
+    FileManager manager(FileSize::fromKilobytes(1));
+    RegularUser ivan("ivan", "Ivan", Timestamp::of(0));
+    manager.createDirectory(Path::parse("/docs"), ivan, Timestamp::of(0));
+    manager.createFile(kNotes, "payload", ivan, Timestamp::of(1));
+    manager.createFile(Path::parse("/docs/image.png"), "123456", ivan, Timestamp::of(2));
+
+    SearchQuery query;
+    EXPECT_TRUE(query.isEmpty());
+    EXPECT_THROW(query.buildFilter(manager.storage()), FileSystemException);
+
+    query.withName("NOTES", false).withSizeRange(FileSize::fromBytes(1), FileSize::fromBytes(10));
+    const auto found = manager.search(*query.buildFilter(manager.storage()));
+    EXPECT_EQ(found.size(), 1u);
+    EXPECT_EQ(found[0].toString(), "/docs/notes.txt");
+}
+
+TEST(SearchQueryTest, SupportsTagCriterion)
+{
+    FileManager manager(FileSize::fromKilobytes(1));
+    RegularUser ivan("ivan", "Ivan", Timestamp::of(0));
+    manager.createDirectory(Path::parse("/docs"), ivan, Timestamp::of(0));
+    manager.createFile(kNotes, "payload", ivan, Timestamp::of(1));
+    manager.tag(kNotes, Tag("work"));
+
+    SearchQuery query;
+    query.withTag("work");
+    const auto found = manager.search(*query.buildFilter(manager.storage()));
+    EXPECT_EQ(found.size(), 1u);
+}
+
+TEST(ShareServiceTest, PublishesAndExpiresTokens)
+{
+    ShareService shares;
+    const std::string token = shares.createShare(kNotes, "ivan", Timestamp::of(10), 60);
+    EXPECT_EQ(shares.activeCount(), 1u);
+
+    const ShareLink& link = shares.resolve(token, Timestamp::of(30));
+    EXPECT_EQ(link.path().toString(), "/docs/notes.txt");
+    EXPECT_EQ(link.owner(), "ivan");
+    EXPECT_EQ(link.hits(), 1);
+    EXPECT_TRUE(shares.resolve(token, Timestamp::of(30)).path() == kNotes);
+
+    EXPECT_THROW(shares.resolve(token, Timestamp::of(100)), PermissionDeniedException);
+    EXPECT_THROW(shares.resolve("share-999", Timestamp::of(30)), PathNotFoundException);
+
+    shares.revoke(token);
+    EXPECT_THROW(shares.resolve(token, Timestamp::of(30)), PathNotFoundException);
+    EXPECT_THROW(shares.revoke(token), PathNotFoundException);
+}
+
+TEST(ReportServiceTest, CollectsInfoAndListings)
+{
+    FileManager manager(FileSize::fromKilobytes(1));
+    RegularUser ivan("ivan", "Ivan", Timestamp::of(0));
+    manager.createDirectory(Path::parse("/docs"), ivan, Timestamp::of(0));
+    manager.createFile(kNotes, "hello", ivan, Timestamp::of(1));
+
+    const auto info = ReportService().collectInfo(manager.storage());
+    ASSERT_EQ(info.size(), 3u);
+    EXPECT_EQ(info[2].path().toString(), "/docs/notes.txt");
+    EXPECT_EQ(info[2].kind(), "file");
+    EXPECT_EQ(info[2].size().bytes(), 5u);
+    EXPECT_NE(info[2].toLine().find("notes.txt"), std::string::npos);
+
+    const DirectoryListing listing =
+        ReportService().listDirectory(manager.storage(), Path::parse("/docs"));
+    EXPECT_EQ(listing.fileCount(), 1u);
+    EXPECT_EQ(listing.directoryCount(), 0u);
+    EXPECT_EQ(listing.totalBytes().bytes(), 5u);
+    EXPECT_NE(listing.toLine().find("notes.txt"), std::string::npos);
+
+    EXPECT_THROW(ReportService().listDirectory(manager.storage(), kNotes),
+                 NotADirectoryException);
+}
+
+TEST(ClockTest, StepsByConfiguredInterval)
+{
+    Clock clock(100, 5);
+    EXPECT_EQ(clock.now().seconds(), 100);
+    EXPECT_EQ(clock.next().seconds(), 100);
+    EXPECT_EQ(clock.now().seconds(), 105);
+    EXPECT_EQ(clock.next().seconds(), 105);
 }

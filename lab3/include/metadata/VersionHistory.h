@@ -17,8 +17,14 @@ namespace fs
 class VersionHistory
 {
 public:
-    /** @brief Создаёт пустую историю. */
+    /** @brief Создаёт пустую историю без лимита версий. */
     VersionHistory();
+
+    /**
+     * @brief Создаёт историю с лимитом версий.
+     * @param maxVersions Сколько версий хранить; ноль — без лимита.
+     */
+    explicit VersionHistory(std::size_t maxVersions);
 
     /**
      * @brief Сохраняет новую версию содержимого.
@@ -53,7 +59,10 @@ public:
     EntryVersion rollbackTo(int number, Timestamp at);
 
 private:
+    void trimToLimit();
+
     std::vector<EntryVersion> versions_;
+    std::size_t maxVersions_;
 };
 
 }

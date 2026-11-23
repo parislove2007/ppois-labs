@@ -38,9 +38,34 @@ public:
     /** @return Количество меток. */
     std::size_t tagCount() const;
 
+    const std::string& author() const;
+    void setAuthor(std::string author);
+
+    const std::string& language() const;
+    void setLanguage(std::string language);
+
+    const std::string& createdBy() const;
+    void setCreatedBy(std::string login);
+
+    /** @brief Переключает признак «избранное». */
+    void toggleFavorite();
+    bool isFavorite() const;
+
+    /**
+     * @brief Ставит оценку от нуля до пяти.
+     * @throws FileSystemException Если оценка вне диапазона.
+     */
+    void setRating(int rating);
+    int rating() const;
+
 private:
     std::string description_;
     std::vector<Tag> tags_;
+    std::string author_;
+    std::string language_;
+    std::string createdBy_;
+    bool isFavorite_;
+    int rating_;
 };
 
 }

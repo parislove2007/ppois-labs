@@ -22,6 +22,13 @@ public:
     using FileSystemEntry::FileSystemEntry;
 
     /**
+     * @brief Создаёт каталог с лимитом записей.
+     * @param entryLimit Максимум записей; ноль — без лимита.
+     */
+    Directory(std::string name, std::string owner, Permission permission, Timestamp created,
+              std::size_t entryLimit);
+
+    /**
      * @brief Добавляет запись в каталог.
      * @param entry Добавляемая запись; каталог забирает владение.
      * @param at Момент изменения.
@@ -58,6 +65,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<FileSystemEntry>> entries_;
+    std::size_t entryLimit_;
 
     std::vector<std::unique_ptr<FileSystemEntry>>::iterator findIterator(
         const std::string& name);

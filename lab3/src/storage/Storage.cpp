@@ -4,11 +4,17 @@
 #include "error/FileSystemException.h"
 #include "error/NotADirectoryException.h"
 #include "error/PathNotFoundException.h"
+#include "error/StorageFullException.h"
 
 namespace fs
 {
 
-Storage::Storage() : root_("/", "system", Permission::readWrite(), Timestamp())
+Storage::Storage() : Storage(FileSize())
+{
+}
+
+Storage::Storage(FileSize capacity)
+    : root_("/", "system", Permission::readWrite(), Timestamp()), capacity_(capacity)
 {
 }
 
@@ -34,6 +40,11 @@ FileSystemEntry& Storage::resolve(const Path& path)
         current = &dynamic_cast<Directory&>(*current).find(segment);
     }
     return *current;
+}
+
+const FileSystemEntry& Storage::resolve(const Path& path) const
+{
+    return const_cast<Storage*>(this)->resolve(path);
 }
 
 Directory& Storage::ensureDirectory(const Path& path, const std::string& owner, Timestamp at)
@@ -66,8 +77,21 @@ Directory& Storage::ensureDirectory(const Path& path, const std::string& owner, 
 
 void Storage::attach(const Path& path, std::unique_ptr<FileSystemEntry> entry, Timestamp at)
 {
+    ensureCapacity(*entry);
     Directory& parent = parentDirectoryFor(path);
     parent.add(std::move(entry), at);
+}
+
+void Storage::ensureCapacity(const FileSystemEntry& entry) const
+{
+    if (capacity_.isZero())
+    {
+        return;
+    }
+    if (!root_.size().fitsIn(capacity_ - entry.size()) && !entry.size().isZero())
+    {
+        throw StorageFullException("Storage capacity exceeded");
+    }
 }
 
 std::unique_ptr<FileSystemEntry> Storage::detach(const Path& path, Timestamp at)

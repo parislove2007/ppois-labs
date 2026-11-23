@@ -19,6 +19,9 @@ namespace fs
 class TrashBin
 {
 public:
+    /** @brief Создаёт корзину без ограничения размера. */
+    TrashBin();
+
     /**
      * @brief Перемещает запись в корзину.
      * @param origin Исходный путь записи.
@@ -48,6 +51,18 @@ public:
     /** @brief Очищает корзину. */
     void clear();
 
+    /** @return Сколько записей восстановлено за всё время. */
+    std::size_t restoredCount() const;
+
+    /** @return Сколько записей уничтожено при очистках. */
+    std::size_t clearedCount() const;
+
+    /**
+     * @brief Создаёт корзину с лимитом записей.
+     * @param maxItems Максимум записей; ноль — без лимита.
+     */
+    explicit TrashBin(std::size_t maxItems);
+
 private:
     struct Item
     {
@@ -58,6 +73,9 @@ private:
     void checkIndex(std::size_t index) const;
 
     std::vector<Item> items_;
+    std::size_t maxItems_;
+    std::size_t restoredCount_;
+    std::size_t clearedCount_;
 };
 
 }

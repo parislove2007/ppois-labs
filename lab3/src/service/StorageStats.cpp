@@ -50,6 +50,16 @@ FileSize StorageStats::totalBytes() const
     return totalBytes_;
 }
 
+void StorageStats::stamp(Timestamp at)
+{
+    computedAt_ = at;
+}
+
+Timestamp StorageStats::computedAt() const
+{
+    return computedAt_;
+}
+
 std::string StorageStats::toLine() const
 {
     return std::to_string(directories_) + " directories, " + std::to_string(files_)

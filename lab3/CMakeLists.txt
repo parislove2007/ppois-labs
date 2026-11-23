@@ -33,8 +33,13 @@ add_library(lab3_core STATIC
     src/search/SearchService.cpp
     src/search/SizeFilter.cpp
     src/search/TagFilter.cpp
+    src/service/DirectoryListing.cpp
+    src/service/FileInfo.cpp
     src/service/FileManager.cpp
     src/service/ReportService.cpp
+    src/service/SearchQuery.cpp
+    src/service/ShareLink.cpp
+    src/service/ShareService.cpp
     src/service/StorageStats.cpp
     src/service/ReportService.cpp
     src/metadata/EntryVersion.cpp

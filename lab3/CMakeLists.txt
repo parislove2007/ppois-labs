@@ -19,6 +19,12 @@ add_library(lab3_core STATIC
     src/error/QuotaExceededException.cpp
     src/error/StorageFullException.cpp
     src/error/VersionConflictException.cpp
+    src/value/Checksum.cpp
+    src/value/FileExtension.cpp
+    src/value/FileSize.cpp
+    src/value/Path.cpp
+    src/value/Permission.cpp
+    src/value/Timestamp.cpp
 )
 
 option(ENABLE_COVERAGE "Enable coverage reporting" OFF)

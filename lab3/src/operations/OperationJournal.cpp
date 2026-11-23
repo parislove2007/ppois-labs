@@ -5,9 +5,21 @@
 namespace fs
 {
 
+OperationJournal::OperationJournal() : maxEntries_(0)
+{
+}
+
+OperationJournal::OperationJournal(std::size_t maxEntries) : maxEntries_(maxEntries)
+{
+}
+
 void OperationJournal::log(std::unique_ptr<Operation> operation)
 {
     entries_.push_back(std::move(operation));
+    if (maxEntries_ != 0 && entries_.size() > maxEntries_)
+    {
+        entries_.erase(entries_.begin());
+    }
 }
 
 std::size_t OperationJournal::count() const

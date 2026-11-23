@@ -35,11 +35,14 @@ add_library(lab3_core STATIC
     src/search/TagFilter.cpp
     src/service/FileManager.cpp
     src/service/ReportService.cpp
+    src/service/StorageStats.cpp
+    src/service/ReportService.cpp
     src/metadata/EntryVersion.cpp
     src/metadata/FileMetadata.cpp
     src/metadata/Tag.cpp
     src/metadata/VersionHistory.cpp
     src/storage/BackupService.cpp
+    src/storage/Quota.cpp
     src/storage/QuotaManager.cpp
     src/storage/Storage.cpp
     src/storage/TrashBin.cpp
@@ -47,6 +50,10 @@ add_library(lab3_core STATIC
     src/user/Administrator.cpp
     src/user/Guest.cpp
     src/user/Group.cpp
+    src/user/GroupRegistry.cpp
+    src/user/Lock.cpp
+    src/user/LockManager.cpp
+    src/user/UserRegistry.cpp
     src/user/RegularUser.cpp
     src/user/User.cpp
     src/entry/ArchiveFile.cpp
@@ -57,6 +64,7 @@ add_library(lab3_core STATIC
     src/entry/SymbolicLink.cpp
     src/entry/TextFile.cpp
     src/value/Checksum.cpp
+    src/value/Clock.cpp
     src/value/FileExtension.cpp
     src/value/FileSize.cpp
     src/value/Path.cpp

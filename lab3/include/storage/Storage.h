@@ -23,8 +23,14 @@ namespace fs
 class Storage
 {
 public:
-    /** @brief Создаёт хранилище с пустым корнем «/». */
+    /** @brief Создаёт хранилище без ограничения объёма. */
     Storage();
+
+    /**
+     * @brief Создаёт хранилище с общим лимитом объёма.
+     * @param capacity Сколько байтов можно разместить; ноль — без лимита.
+     */
+    explicit Storage(FileSize capacity);
 
     /** @return Корневой каталог. */
     Directory& root();
@@ -38,6 +44,9 @@ public:
      * @throws NotADirectoryException Если промежуточный сегмент — не каталог.
      */
     FileSystemEntry& resolve(const Path& path);
+
+    /** @return Запись по пути для чтения; логика та же, объект не меняется. */
+    const FileSystemEntry& resolve(const Path& path) const;
 
     /**
      * @brief Находит или создаёт каталог по полному пути.
@@ -77,11 +86,14 @@ public:
     void walk(const std::function<void(const Path&, const FileSystemEntry&)>& visitor) const;
 
 private:
+    void ensureCapacity(const FileSystemEntry& entry) const;
+
     Directory& parentDirectoryFor(const Path& path);
     static void walkFrom(const Path& path, const Directory& directory,
                          const std::function<void(const Path&, const FileSystemEntry&)>& visitor);
 
     Directory root_;
+    FileSize capacity_;
     std::map<std::string, FileMetadata> metadata_;
 };
 

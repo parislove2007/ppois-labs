@@ -14,9 +14,9 @@ namespace fs
 class Clock
 {
 public:
-    explicit Clock(std::int64_t startSeconds);
+    explicit Clock(std::int64_t startSeconds, std::int64_t stepSeconds = 1);
 
-    /** @brief Возвращает текущую метку и сдвигает часы на секунду. */
+    /** @brief Возвращает текущую метку и сдвигает часы на шаг. */
     Timestamp next();
 
     /** @return Текущая метка без сдвига. */
@@ -24,6 +24,7 @@ public:
 
 private:
     std::int64_t current_;
+    std::int64_t stepSeconds_;
 };
 
 }

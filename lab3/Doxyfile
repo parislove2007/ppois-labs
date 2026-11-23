@@ -3,7 +3,7 @@
 # Generate the documentation from the lab3 directory: doxygen Doxyfile
 
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "Lab 2: Repair service center"
+PROJECT_NAME           = "Lab 3: File management system"
 OUTPUT_DIRECTORY       = docs
 OUTPUT_LANGUAGE        = English
 INPUT                  = include src README.md

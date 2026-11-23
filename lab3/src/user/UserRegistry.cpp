@@ -31,12 +31,17 @@ User* UserRegistry::findByLogin(const std::string& login) const
     return it == users_.end() ? nullptr : it->second.get();
 }
 
-User& UserRegistry::authenticate(const std::string& login, const std::string& password)
+User& UserRegistry::authenticate(const std::string& login, const std::string& password,
+                                   Timestamp at)
 {
     auto userIt = users_.find(login);
     if (userIt == users_.end())
     {
         throw PermissionDeniedException("Unknown login: " + login);
+    }
+    if (!userIt->second->isActive())
+    {
+        throw PermissionDeniedException("Account is deactivated: " + login);
     }
     Credentials& credentials = credentials_[login];
     if (credentials.blocked_)
@@ -53,6 +58,7 @@ User& UserRegistry::authenticate(const std::string& login, const std::string& pa
         throw PermissionDeniedException("Wrong password for: " + login);
     }
     credentials.failedAttempts_ = 0;
+    userIt->second->markLoggedIn(at);
     return *userIt->second;
 }
 

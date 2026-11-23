@@ -38,7 +38,18 @@ Permission AccessControlList::permissionFor(const std::string& login) const
 bool AccessControlList::allows(const std::string& login, const Permission& required) const
 {
     auto it = rules_.find(login);
-    return it != rules_.end() && it->second.allows(required);
+    return it != rules_.end() ? it->second.allows(required)
+                              : defaultPermission_.allows(required);
+}
+
+void AccessControlList::setDefaultPermission(Permission permission)
+{
+    defaultPermission_ = permission;
+}
+
+const Permission& AccessControlList::defaultPermission() const
+{
+    return defaultPermission_;
 }
 
 }

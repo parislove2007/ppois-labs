@@ -3,6 +3,7 @@
 #include <string>
 
 #include "error/EntryAlreadyExistsException.h"
+#include "error/FileSystemException.h"
 #include "error/InvalidFileNameException.h"
 #include "error/PathNotFoundException.h"
 #include "error/VersionConflictException.h"
@@ -75,4 +76,49 @@ TEST(FileMetadataTest, ManagesTags)
     metadata.removeTag("work");
     EXPECT_FALSE(metadata.hasTag("work"));
     EXPECT_THROW(metadata.removeTag("work"), PathNotFoundException);
+}
+
+TEST(TagTest, CarriesCategoryAndColor)
+{
+    const Tag tag("work", "priority", "#ff0000");
+    EXPECT_EQ(tag.category(), "priority");
+    EXPECT_EQ(tag.color(), "#ff0000");
+    EXPECT_EQ(Tag("plain").category(), "general");
+}
+
+TEST(EntryVersionTest, KeepsAuthorAndComment)
+{
+    const EntryVersion version(1, "data", Timestamp::of(5), "ivan", "initial import");
+    EXPECT_EQ(version.author(), "ivan");
+    EXPECT_EQ(version.comment(), "initial import");
+}
+
+TEST(VersionHistoryTest, TrimsToLimit)
+{
+    VersionHistory history(2);
+    history.addVersion("one", Timestamp::of(1));
+    history.addVersion("two", Timestamp::of(2));
+    history.addVersion("three", Timestamp::of(3));
+    EXPECT_EQ(history.count(), 2u);
+    EXPECT_EQ(history.findByNumber(2).content(), "two");
+    EXPECT_EQ(history.latest().content(), "three");
+}
+
+TEST(FileMetadataTest, ManagesProfileFields)
+{
+    FileMetadata metadata;
+    metadata.setAuthor("A. Pushkin");
+    metadata.setLanguage("ru");
+    metadata.setCreatedBy("librarian");
+    EXPECT_EQ(metadata.author(), "A. Pushkin");
+    EXPECT_EQ(metadata.language(), "ru");
+    EXPECT_EQ(metadata.createdBy(), "librarian");
+
+    EXPECT_FALSE(metadata.isFavorite());
+    metadata.toggleFavorite();
+    EXPECT_TRUE(metadata.isFavorite());
+
+    metadata.setRating(5);
+    EXPECT_EQ(metadata.rating(), 5);
+    EXPECT_THROW(metadata.setRating(6), FileSystemException);
 }

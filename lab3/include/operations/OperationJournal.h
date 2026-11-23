@@ -15,6 +15,15 @@ namespace fs
 class OperationJournal
 {
 public:
+    /** @brief Создаёт журнал без ограничения размера. */
+    OperationJournal();
+
+    /**
+     * @brief Создаёт журнал с лимитом записей.
+     * @param maxEntries Сколько записей хранить; ноль — без лимита.
+     */
+    explicit OperationJournal(std::size_t maxEntries);
+
     /** @brief Добавляет запись; журнал забирает владение. */
     void log(std::unique_ptr<Operation> operation);
 
@@ -35,6 +44,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<Operation>> entries_;
+    std::size_t maxEntries_;
 };
 
 }

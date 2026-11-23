@@ -3,13 +3,16 @@
 namespace fs
 {
 
-Clock::Clock(std::int64_t startSeconds) : current_(startSeconds)
+Clock::Clock(std::int64_t startSeconds, std::int64_t stepSeconds)
+    : current_(startSeconds), stepSeconds_(stepSeconds)
 {
 }
 
 Timestamp Clock::next()
 {
-    return Timestamp::of(current_++);
+    const Timestamp now = Timestamp::of(current_);
+    current_ += stepSeconds_;
+    return now;
 }
 
 Timestamp Clock::now() const

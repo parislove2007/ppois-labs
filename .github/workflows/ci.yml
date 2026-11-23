@@ -52,6 +52,24 @@ jobs:
       - name: Check lab2 model metrics
         run: python3 lab2/tools/metrics.py
 
+      - name: Configure lab3
+        run: cmake -S lab3 -B build3 -DENABLE_COVERAGE=ON
+
+      - name: Build lab3
+        run: cmake --build build3
+
+      - name: Run lab3 tests
+        run: ctest --test-dir build3 --output-on-failure
+
+      - name: Check lab3 coverage
+        run: gcovr --root . --filter 'lab3/src/' --fail-under-line 90 --print-summary build3
+
+      - name: Static analysis of lab3
+        run: cppcheck --enable=warning,style --error-exitcode=1 --suppress=missingIncludeSystem lab3/src lab3/include
+
+      - name: Check lab3 model metrics
+        run: python3 lab3/tools/metrics.py
+
   release:
     runs-on: ubuntu-latest
     needs: build-and-test
@@ -78,12 +96,17 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_EXE_LINKER_FLAGS="-static"
           cmake --build build-release-lab2 --target lab2_app
+          cmake -S lab3 -B build-release-lab3 \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_EXE_LINKER_FLAGS="-static"
+          cmake --build build-release-lab3 --target lab3_app
 
       - name: Check the binary is self-contained
         run: |
-          file build-release/lab1_app build-release-lab2/lab2_app
+          file build-release/lab1_app build-release-lab2/lab2_app build-release-lab3/lab3_app
           ldd build-release/lab1_app || echo "lab1_app статически слинкован"
           ldd build-release-lab2/lab2_app || echo "lab2_app статически слинкован"
+          ldd build-release-lab3/lab3_app || echo "lab3_app статически слинкован"
 
       - name: Determine release name
         id: meta
@@ -105,6 +128,7 @@ jobs:
           gh release create "${{ steps.meta.outputs.tag }}" \
              build-release/lab1_app \
              build-release-lab2/lab2_app \
+             build-release-lab3/lab3_app \
              --title "${{ steps.meta.outputs.title }}" \
-             --notes "Консольные приложения лабораторных работ 1 и 2. Статически слинкованные бинарные файлы для Linux x86-64." \
+             --notes "Консольные приложения лабораторных работ 1, 2 и 3. Статически слинкованные бинарные файлы для Linux x86-64." \
              ${{ steps.meta.outputs.flags }}

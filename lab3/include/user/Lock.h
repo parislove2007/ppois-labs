@@ -14,9 +14,10 @@ namespace fs
 class Lock
 {
 public:
-    Lock(Path path, std::string owner, Timestamp at);
+    Lock(Path path, std::string owner, Timestamp at, std::string comment = "");
 
     const Path& path() const;
+    const std::string& comment() const;
     const std::string& owner() const;
     Timestamp lockedAt() const;
 
@@ -31,6 +32,7 @@ private:
     Path path_;
     std::string owner_;
     Timestamp lockedAt_;
+    std::string comment_;
 };
 
 }

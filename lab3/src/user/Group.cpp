@@ -1,13 +1,29 @@
 #include "user/Group.h"
 
 #include "error/EntryAlreadyExistsException.h"
+#include "error/FileSystemException.h"
 #include "error/PathNotFoundException.h"
 
 namespace fs
 {
 
-Group::Group(std::string name) : name_(std::move(name))
+Group::Group(std::string name) : Group(std::move(name), "", 0)
 {
+}
+
+Group::Group(std::string name, std::string ownerLogin, std::size_t maxMembers)
+    : name_(std::move(name)), ownerLogin_(std::move(ownerLogin)), maxMembers_(maxMembers)
+{
+}
+
+const std::string& Group::ownerLogin() const
+{
+    return ownerLogin_;
+}
+
+bool Group::isOwnedBy(const std::string& login) const
+{
+    return ownerLogin_ == login;
 }
 
 const std::string& Group::name() const
@@ -20,6 +36,10 @@ void Group::addMember(const std::string& login)
     if (hasMember(login))
     {
         throw EntryAlreadyExistsException("Already in group: " + login);
+    }
+    if (maxMembers_ != 0 && members_.size() >= maxMembers_)
+    {
+        throw FileSystemException("Group is full: " + name_);
     }
     members_.push_back(login);
 }

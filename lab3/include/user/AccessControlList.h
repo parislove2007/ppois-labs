@@ -40,12 +40,21 @@ public:
 
     /**
      * @brief Проверяет доступ логина к требуемым правам.
-     * @return true, если правило есть и прав достаточно.
+     *
+     * Если правила для логина нет, используется право по умолчанию:
+     * так список может открывать доступ «для всех прочих».
+     * @return true, если прав достаточно.
      */
     bool allows(const std::string& login, const Permission& required) const;
 
+    /** @brief Задаёт права по умолчанию для логинов без правила. */
+    void setDefaultPermission(Permission permission);
+
+    const Permission& defaultPermission() const;
+
 private:
     std::map<std::string, Permission> rules_;
+    Permission defaultPermission_;
 };
 
 }

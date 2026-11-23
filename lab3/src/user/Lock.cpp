@@ -3,9 +3,17 @@
 namespace fs
 {
 
-Lock::Lock(Path path, std::string owner, Timestamp at)
-    : path_(std::move(path)), owner_(std::move(owner)), lockedAt_(at)
+Lock::Lock(Path path, std::string owner, Timestamp at, std::string comment)
+    : path_(std::move(path)),
+      owner_(std::move(owner)),
+      lockedAt_(at),
+      comment_(std::move(comment))
 {
+}
+
+const std::string& Lock::comment() const
+{
+    return comment_;
 }
 
 const Path& Lock::path() const
@@ -25,7 +33,7 @@ Timestamp Lock::lockedAt() const
 
 bool Lock::isStale(const Timestamp& now, std::int64_t maxAgeSeconds) const
 {
-    return lockedAt_.diffSeconds(now) > maxAgeSeconds;
+    return now.diffSeconds(lockedAt_) > maxAgeSeconds;
 }
 
 }

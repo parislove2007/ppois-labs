@@ -32,9 +32,10 @@ public:
 
     /**
      * @brief Проверяет корректность пароля.
+     * @param at Момент входа: фиксируется в профиле пользователя.
      * @throws PermissionDeniedException Если пароль неверен или вход заблокирован.
      */
-    User& authenticate(const std::string& login, const std::string& password);
+    User& authenticate(const std::string& login, const std::string& password, Timestamp at);
 
     /** @return Логины всех зарегистрированных пользователей. */
     std::vector<std::string> logins() const;

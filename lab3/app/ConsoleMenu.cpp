@@ -49,7 +49,7 @@ ConsoleMenu::ConsoleMenu(std::istream& in, std::ostream& out, FileManager& manag
       user_("ivan", "Ivan Ivanov", Timestamp::of(0)),
       guest_("guest", "Guest", Timestamp::of(0)),
       current_(&user_),
-      clock_(1)
+      clock_(1, 1)
 {
 }
 
@@ -92,7 +92,7 @@ void ConsoleMenu::handleCommand(const std::string& line)
 {
     const std::string argument = secondWord(line);
     const std::string rest = restAfterSecond(line);
-    const Timestamp at = Timestamp::of(clock_++);
+    const Timestamp at = clock_.next();
 
     if (line == "help")
     {
@@ -190,6 +190,14 @@ void ConsoleMenu::handleCommand(const std::string& line)
     {
         out_ << "restored " << manager_.restoreBackup(at) << " files\n";
     }
+    else if (line.rfind("share ", 0) == 0)
+    {
+        doShare(argument);
+    }
+    else if (line.rfind("resolve ", 0) == 0)
+    {
+        doResolveShare(argument);
+    }
     else if (line == "journal")
     {
         doJournal();
@@ -207,7 +215,7 @@ void ConsoleMenu::doTree()
 
 void ConsoleMenu::doCreateFile(const std::string& path, const std::string& content)
 {
-    manager_.createFile(Path::parse(path), content, *current_, Timestamp::of(clock_++));
+    manager_.createFile(Path::parse(path), content, *current_, clock_.next());
     out_ << "created " << path << "\n";
 }
 
@@ -219,7 +227,7 @@ void ConsoleMenu::doRead(const std::string& path)
 
 void ConsoleMenu::doRemove(const std::string& path)
 {
-    manager_.remove(Path::parse(path), Timestamp::of(clock_++));
+    manager_.remove(Path::parse(path), clock_.next());
     out_ << "moved to trash\n";
 }
 
@@ -252,6 +260,19 @@ void ConsoleMenu::doQuota(const std::string& login)
 {
     out_ << "used " << manager_.quotas().usedOf(login).bytes() << " of "
          << manager_.quotas().quotaOf(login).bytes() << " bytes\n";
+}
+
+void ConsoleMenu::doShare(const std::string& path)
+{
+    const std::string token =
+        shares_.createShare(Path::parse(path), current_->login(), clock_.now(), 3600);
+    out_ << "shared as " << token << "\n";
+}
+
+void ConsoleMenu::doResolveShare(const std::string& token)
+{
+    const ShareLink& link = shares_.resolve(token, clock_.now());
+    out_ << link.path() << " (owner " << link.owner() << ")\n";
 }
 
 void ConsoleMenu::switchUser(const std::string& role)

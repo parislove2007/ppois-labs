@@ -3,6 +3,7 @@
 #include <cstddef>
 
 #include "value/FileSize.h"
+#include "value/Timestamp.h"
 
 namespace fs
 {
@@ -28,11 +29,16 @@ public:
     /** @return Строка сводки для отчёта. */
     std::string toLine() const;
 
+    /** @brief Проставляет момент, на который посчитана сводка. */
+    void stamp(Timestamp at);
+    Timestamp computedAt() const;
+
 private:
     std::size_t directories_;
     std::size_t files_;
     std::size_t links_;
     FileSize totalBytes_;
+    Timestamp computedAt_;
 };
 
 }

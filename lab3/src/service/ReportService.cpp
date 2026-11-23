@@ -5,6 +5,7 @@
 #include <string>
 
 #include "entry/SymbolicLink.h"
+#include "error/NotADirectoryException.h"
 
 namespace fs
 {
@@ -34,28 +35,77 @@ std::string ReportService::treeText(const Storage& storage) const
     return text;
 }
 
-std::string ReportService::summaryLine(const Storage& storage) const
+StorageStats ReportService::computeStats(const Storage& storage) const
 {
-    std::size_t directories = 0;
-    std::size_t files = 0;
-    std::size_t links = 0;
-    storage.walk([&directories, &files, &links](const Path&, const FileSystemEntry& entry) {
+    StorageStats stats;
+    storage.walk([&stats](const Path&, const FileSystemEntry& entry) {
         if (entry.isDirectory())
         {
-            ++directories;
+            stats.countDirectory();
         }
         else if (dynamic_cast<const SymbolicLink*>(&entry) != nullptr)
         {
-            ++links;
+            stats.countLink();
+        }
+        else
+        {
+            stats.countFile();
+        }
+        stats.addBytes(entry.size());
+    });
+    stats.stamp(storage.root().modified());
+    return stats;
+}
+
+std::string ReportService::summaryLine(const Storage& storage) const
+{
+    return computeStats(storage).toLine();
+}
+
+std::vector<FileInfo> ReportService::collectInfo(const Storage& storage) const
+{
+    std::vector<FileInfo> result;
+    storage.walk([&result](const Path& path, const FileSystemEntry& entry) {
+        std::string kind = "file";
+        if (entry.isDirectory())
+        {
+            kind = "dir";
+        }
+        else if (dynamic_cast<const SymbolicLink*>(&entry) != nullptr)
+        {
+            kind = "link";
+        }
+        result.emplace_back(path, entry.owner(), kind, entry.size(), entry.isDirectory(),
+                            entry.modified(), entry.permission());
+    });
+    return result;
+}
+
+DirectoryListing ReportService::listDirectory(const Storage& storage,
+                                              const Path& path) const
+{
+    const FileSystemEntry& entry = storage.resolve(path);
+    if (!entry.isDirectory())
+    {
+        throw NotADirectoryException("Not a directory: " + path.toString());
+    }
+    const Directory& directory = dynamic_cast<const Directory&>(entry);
+    std::vector<std::string> names;
+    std::size_t files = 0;
+    std::size_t directories = 0;
+    for (const std::unique_ptr<FileSystemEntry>& child : directory.entries())
+    {
+        names.push_back(child->name());
+        if (child->isDirectory())
+        {
+            ++directories;
         }
         else
         {
             ++files;
         }
-    });
-    return std::to_string(directories) + " directories, " + std::to_string(files)
-         + " files, " + std::to_string(links) + " links, total "
-         + std::to_string(storage.root().size().bytes()) + " bytes";
+    }
+    return DirectoryListing(path, std::move(names), files, directories, directory.size());
 }
 
 std::vector<std::pair<Path, FileSize>> ReportService::topLargest(const Storage& storage,

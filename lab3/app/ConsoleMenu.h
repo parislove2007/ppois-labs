@@ -4,9 +4,11 @@
 #include <string>
 
 #include "service/FileManager.h"
+#include "service/ShareService.h"
 #include "user/Administrator.h"
 #include "user/Guest.h"
 #include "user/RegularUser.h"
+#include "value/Clock.h"
 
 namespace fs
 {
@@ -36,6 +38,8 @@ private:
     void doVersions(const std::string& path);
     void doJournal();
     void doQuota(const std::string& login);
+    void doShare(const std::string& path);
+    void doResolveShare(const std::string& token);
     void switchUser(const std::string& role);
 
     std::istream& in_;
@@ -45,7 +49,8 @@ private:
     RegularUser user_;
     Guest guest_;
     User* current_;
-    long clock_;
+    Clock clock_;
+    ShareService shares_;
 };
 
 }

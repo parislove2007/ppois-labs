@@ -19,6 +19,13 @@ add_library(lab3_core STATIC
     src/error/QuotaExceededException.cpp
     src/error/StorageFullException.cpp
     src/error/VersionConflictException.cpp
+    src/entry/ArchiveFile.cpp
+    src/entry/BinaryFile.cpp
+    src/entry/Directory.cpp
+    src/entry/File.cpp
+    src/entry/FileSystemEntry.cpp
+    src/entry/SymbolicLink.cpp
+    src/entry/TextFile.cpp
     src/value/Checksum.cpp
     src/value/FileExtension.cpp
     src/value/FileSize.cpp

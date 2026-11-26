@@ -1,5 +1,7 @@
 #include "metadata/VersionHistory.h"
 
+#include <algorithm>
+
 #include "error/VersionConflictException.h"
 
 namespace fs
@@ -48,14 +50,15 @@ const EntryVersion& VersionHistory::latest() const
 
 const EntryVersion& VersionHistory::findByNumber(int number) const
 {
-    for (const EntryVersion& version : versions_)
+    const auto it = std::find_if(versions_.begin(), versions_.end(),
+                                 [number](const EntryVersion& version) {
+                                     return version.number() == number;
+                                 });
+    if (it == versions_.end())
     {
-        if (version.number() == number)
-        {
-            return version;
-        }
+        throw VersionConflictException("No version #" + std::to_string(number));
     }
-    throw VersionConflictException("No version #" + std::to_string(number));
+    return *it;
 }
 
 EntryVersion VersionHistory::rollbackTo(int number, Timestamp at)

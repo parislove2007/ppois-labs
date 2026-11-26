@@ -1,5 +1,7 @@
 #include "metadata/FileMetadata.h"
 
+#include <algorithm>
+
 #include "error/EntryAlreadyExistsException.h"
 #include "error/FileSystemException.h"
 #include "error/PathNotFoundException.h"
@@ -46,14 +48,8 @@ void FileMetadata::removeTag(const std::string& label)
 
 bool FileMetadata::hasTag(const std::string& label) const
 {
-    for (const Tag& tag : tags_)
-    {
-        if (tag.label() == label)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(tags_.begin(), tags_.end(),
+                       [&label](const Tag& tag) { return tag.label() == label; });
 }
 
 std::size_t FileMetadata::tagCount() const

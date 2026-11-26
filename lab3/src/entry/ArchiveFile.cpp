@@ -1,5 +1,7 @@
 #include "entry/ArchiveFile.h"
 
+#include <algorithm>
+
 #include "error/EntryAlreadyExistsException.h"
 #include "error/FileSystemException.h"
 
@@ -58,14 +60,10 @@ std::size_t ArchiveFile::packedCount() const
 
 bool ArchiveFile::containsPacked(const std::string& entryName) const
 {
-    for (const std::string& packed : packedNames_)
-    {
-        if (packed == entryName)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(packedNames_.begin(), packedNames_.end(),
+                       [&entryName](const std::string& packed) {
+                           return packed == entryName;
+                       });
 }
 
 }

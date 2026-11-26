@@ -1,5 +1,8 @@
 #include "entry/Directory.h"
 
+#include <algorithm>
+#include <numeric>
+
 #include "error/EntryAlreadyExistsException.h"
 #include "error/PathNotFoundException.h"
 #include "error/StorageFullException.h"
@@ -53,14 +56,10 @@ FileSystemEntry& Directory::find(const std::string& name)
 
 bool Directory::contains(const std::string& name) const
 {
-    for (const std::unique_ptr<FileSystemEntry>& entry : entries_)
-    {
-        if (entry->name() == name)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(entries_.begin(), entries_.end(),
+                       [&name](const std::unique_ptr<FileSystemEntry>& entry) {
+                           return entry->name() == name;
+                       });
 }
 
 std::size_t Directory::entryCount() const
@@ -75,12 +74,11 @@ const std::vector<std::unique_ptr<FileSystemEntry>>& Directory::entries() const
 
 FileSize Directory::size() const
 {
-    FileSize total;
-    for (const std::unique_ptr<FileSystemEntry>& entry : entries_)
-    {
-        total = total + entry->size();
-    }
-    return total;
+    return std::accumulate(entries_.begin(), entries_.end(), FileSize(),
+                           [](const FileSize& total,
+                              const std::unique_ptr<FileSystemEntry>& entry) {
+                               return total + entry->size();
+                           });
 }
 
 std::string Directory::describe() const

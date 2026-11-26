@@ -1,5 +1,7 @@
 #include "service/SearchQuery.h"
 
+#include <limits>
+
 #include "error/FileSystemException.h"
 #include "search/CompositeFilter.h"
 #include "search/DateFilter.h"
@@ -14,7 +16,15 @@ namespace fs
 {
 
 SearchQuery::SearchQuery()
-    : caseSensitive_(true), minSize_(FileSize()), maxSize_(FileSize()), modifiedAfter_(Timestamp())
+    : caseSensitive_(true),
+      minSize_(FileSize()),
+      maxSize_(FileSize()),
+      modifiedAfter_(Timestamp()),
+      hasName_(false),
+      hasExtension_(false),
+      hasSize_(false),
+      hasTime_(false),
+      hasTag_(false)
 {
 }
 
@@ -81,7 +91,8 @@ std::unique_ptr<SearchFilter> SearchQuery::buildFilter(const Storage& storage) c
     }
     if (hasTime_)
     {
-        combined->add(std::make_unique<DateFilter>(modifiedAfter_, Timestamp::of(1 << 40)));
+        combined->add(std::make_unique<DateFilter>(
+            modifiedAfter_, Timestamp::of(std::numeric_limits<std::int64_t>::max())));
     }
     if (hasTag_)
     {

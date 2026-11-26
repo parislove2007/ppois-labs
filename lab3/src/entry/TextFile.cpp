@@ -1,5 +1,7 @@
 #include "entry/TextFile.h"
 
+#include <algorithm>
+
 namespace fs
 {
 
@@ -22,15 +24,7 @@ int TextFile::lineCount() const
     {
         return 0;
     }
-    int lines = 1;
-    for (char ch : content_)
-    {
-        if (ch == '\n')
-        {
-            ++lines;
-        }
-    }
-    return lines;
+    return 1 + static_cast<int>(std::count(content_.begin(), content_.end(), '\n'));
 }
 
 const std::string& TextFile::encoding() const

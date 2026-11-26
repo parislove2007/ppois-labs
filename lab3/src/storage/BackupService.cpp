@@ -1,5 +1,7 @@
 #include "storage/BackupService.h"
 
+#include <algorithm>
+
 #include "entry/File.h"
 #include "value/Checksum.h"
 #include "error/PathNotFoundException.h"
@@ -92,26 +94,21 @@ std::string BackupService::describe() const
 
 bool BackupService::has(const Path& path) const
 {
-    for (const BackupRecord& record : records_)
-    {
-        if (record.path() == path)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(records_.begin(), records_.end(),
+                       [&path](const BackupRecord& record) { return record.path() == path; });
 }
 
 std::string BackupService::contentOf(const Path& path) const
 {
-    for (const BackupRecord& record : records_)
+    const auto it = std::find_if(records_.begin(), records_.end(),
+                                 [&path](const BackupRecord& record) {
+                                     return record.path() == path;
+                                 });
+    if (it == records_.end())
     {
-        if (record.path() == path)
-        {
-            return record.content();
-        }
+        throw PathNotFoundException("Not in backup: " + path.toString());
     }
-    throw PathNotFoundException("Not in backup: " + path.toString());
+    return it->content();
 }
 
 std::size_t BackupService::restoreTo(Storage& storage, Timestamp at) const

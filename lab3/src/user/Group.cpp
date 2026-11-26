@@ -1,5 +1,7 @@
 #include "user/Group.h"
 
+#include <algorithm>
+
 #include "error/EntryAlreadyExistsException.h"
 #include "error/FileSystemException.h"
 #include "error/PathNotFoundException.h"
@@ -59,14 +61,8 @@ void Group::removeMember(const std::string& login)
 
 bool Group::hasMember(const std::string& login) const
 {
-    for (const std::string& member : members_)
-    {
-        if (member == login)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(members_.begin(), members_.end(),
+                       [&login](const std::string& member) { return member == login; });
 }
 
 std::size_t Group::memberCount() const

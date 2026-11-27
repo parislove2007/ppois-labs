@@ -113,11 +113,11 @@ jobs:
         run: |
           if [ "${{ github.ref_type }}" = "tag" ]; then
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "title=Лабораторная работа 1 (${{ github.ref_name }})" >> "$GITHUB_OUTPUT"
+            echo "title=Лабораторные работы 1–3 (${{ github.ref_name }})" >> "$GITHUB_OUTPUT"
             echo "flags=" >> "$GITHUB_OUTPUT"
           else
             echo "tag=main-${{ github.run_number }}" >> "$GITHUB_OUTPUT"
-            echo "title=Лабораторная работа 1 (сборка main #${{ github.run_number }})" >> "$GITHUB_OUTPUT"
+            echo "title=Лабораторные работы 1–3 (сборка main #${{ github.run_number }})" >> "$GITHUB_OUTPUT"
             echo "flags=--prerelease" >> "$GITHUB_OUTPUT"
           fi
 
